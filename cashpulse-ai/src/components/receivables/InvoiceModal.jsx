@@ -49,7 +49,11 @@ function buildWhatsAppText(invoice) {
     formatDate(invoice.dueDate) +
     ". " +
     PAYMENT_LINE +
-    ". Thank you, CashPulse Studio."
+    ". " +
+    "⚡ Pay instantly via UPI: ravi@upi or scan the QR code on your invoice. Amount: " +
+    formatINR(invoice.amount) +
+    ". " +
+    "Thank you, CashPulse Studio."
   );
 }
 
@@ -65,6 +69,12 @@ export default function InvoiceModal({ invoice, onClose }) {
   }, [invoice, onClose]);
 
   if (!invoice) return null;
+
+  const upiParams = `pa=ravi@upi&pn=CashPulse%20Studio&am=${invoice.amount}&cu=INR&tn=Invoice%20${invoice.id}`;
+  const upiLink = `upi://pay?${upiParams}`;
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiLink)}`;
+  const locked = invoice.status !== "paid";
+
 
   const handlePrint = () => window.print();
 
@@ -184,6 +194,68 @@ export default function InvoiceModal({ invoice, onClose }) {
             </p>
             <p className="mt-1 text-slate-900">{PAYMENT_LINE}</p>
           </div>
+
+          {/* Instant UPI payment (QR stays printed; app-pay button is hidden on print) */}
+          <div className="mt-6 rounded-lg border border-slate-200 p-4 text-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              ⚡ Instant UPI Payment
+            </p>
+            <div className="mt-3 flex flex-wrap items-start gap-4">
+              <div className="flex flex-col items-start gap-2">
+                <img
+                  src={qrSrc}
+                  width={160}
+                  height={160}
+                  alt={"UPI QR code to pay invoice " + invoice.id}
+                  loading="lazy"
+                  className="h-40 w-40 rounded border border-slate-200 bg-white"
+                />
+                <p className="max-w-[160px] text-[11px] text-slate-500">
+                  QR needs internet access. Use the UPI ID ravi@upi if it does not load.
+                </p>
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col gap-3">
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+                    GPay
+                  </span>
+                  <span className="rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+                    PhonePe
+                  </span>
+                  <span className="rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+                    Paytm
+                  </span>
+                </div>
+                <p className="text-slate-900">UPI ID: ravi@upi</p>
+                <a
+                  href={upiLink}
+                  className="no-print inline-flex w-fit items-center rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-700"
+                >
+                  📲 Pay via UPI App (GPay / PhonePe)
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Escrow Deliverables Vault (stays visible when printed) */}
+          {locked ? (
+            <div className="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+              <p className="text-[11px] font-semibold uppercase tracking-wider">
+                Escrow Deliverables Vault
+              </p>
+              <p className="mt-1">
+                🔒 Production Deliverables Locked in Escrow. Pay via UPI to auto-release.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-6 rounded-lg border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900">
+              <p className="text-[11px] font-semibold uppercase tracking-wider">
+                Escrow Deliverables Vault
+              </p>
+              <p className="mt-1">🔓 Production Assets Unlocked &amp; Verified.</p>
+            </div>
+          )}
+
 
           {/* Footer */}
           <p className="mt-10 border-t border-slate-200 pt-4 text-xs text-slate-500">

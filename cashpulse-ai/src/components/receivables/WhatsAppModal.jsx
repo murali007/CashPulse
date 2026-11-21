@@ -7,6 +7,7 @@ const TONES = [
   { id: "friendly", label: "Friendly" },
   { id: "firm", label: "Firm" },
   { id: "final", label: "Final notice" },
+  { id: "alex", label: "🤖 Alex (AI Accounts Agent)" },
 ];
 
 // Build the WhatsApp message text for an invoice in the given tone.
@@ -23,6 +24,10 @@ function buildMessage(invoice, tone, today) {
 
   if (tone === "final") {
     return `Dear ${invoice.clientName},\n\nThis is a final notice regarding invoice ${invoice.id} for ${amount} (${invoice.projectTitle}), which is now ${days} days overdue (due ${due}).\n\nPlease settle the outstanding amount immediately. Until payment is received, work on new projects will be paused.\n\nRegards`;
+  }
+
+  if (tone === "alex") {
+    return `This is an automated notice from Alex - Automated Settlement Protocol at CashPulse, sent on behalf of the studio.\n\nInvoice ${invoice.id} for ${amount} (${invoice.projectTitle}) was due on ${due} and is now ${days} days overdue.\n\nPlease settle the outstanding amount using either of the following:\n- UPI ID: ravi@upi\n- Bank transfer: HDFC Bank A/C 501002345678\n\nPlease confirm settlement or reply to this notice within 3 working days.\n\nAlex - Automated Settlement Protocol at CashPulse on behalf of the studio`;
   }
 
   return `Hi ${invoice.clientName}, a quick reminder that invoice ${invoice.id} for ${amount} (${invoice.projectTitle}) was due on ${due}. Could you share the payment timing? Thanks!`;
@@ -141,7 +146,7 @@ export default function WhatsAppModal({ invoice, onClose }) {
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             Tone
           </p>
-          <div className="mt-2 grid grid-cols-3 gap-2 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+          <div className="mt-2 grid grid-cols-4 gap-2 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
             {TONES.map((t) => {
               const active = tone === t.id;
               return (

@@ -4,6 +4,7 @@ import Card from "../components/common/Card.jsx";
 import Badge from "../components/common/Badge.jsx";
 import WhatsAppModal from "../components/receivables/WhatsAppModal.jsx";
 import InvoiceModal from "../components/receivables/InvoiceModal.jsx";
+import RiskDossier from "../components/receivables/RiskDossier.jsx";
 import { formatINR, formatDate, daysBetween } from "../utils/format.js";
 import { MessageCircle, CheckCircle2, FileText } from "lucide-react";
 
@@ -89,6 +90,7 @@ export default function ReceivablesInvoices() {
   const { invoices, today, agingMatrix, markInvoicePaid } = useAppStore();
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [pdfInvoice, setPdfInvoice] = useState(null);
+  const [dossierFor, setDossierFor] = useState(null);
 
   const sortedInvoices = useMemo(() => [...invoices].sort(byDueDate), [invoices]);
 
@@ -260,7 +262,25 @@ export default function ReceivablesInvoices() {
                     <StatusBadge invoice={inv} today={today} />
                   </td>
                   <td className="px-4 py-3">
-                    <ReliabilityMeter score={inv.reliabilityScore} />
+                    <div className="relative inline-block">
+                      <button
+                        type="button"
+                        aria-label={`Open client risk dossier for ${inv.clientName}`}
+                        onClick={() => setDossierFor(dossierFor === inv.id ? null : inv.id)}
+                        className="rounded-md text-left transition hover:opacity-80"
+                      >
+                        <ReliabilityMeter score={inv.reliabilityScore} />
+                      </button>
+                      {dossierFor === inv.id ? (
+                        <div className="absolute z-40 top-full mt-2 left-0">
+                          <RiskDossier
+                            clientName={inv.clientName}
+                            reliabilityScore={inv.reliabilityScore}
+                            onClose={() => setDossierFor(null)}
+                          />
+                        </div>
+                      ) : null}
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="inline-flex items-center justify-end gap-2">
