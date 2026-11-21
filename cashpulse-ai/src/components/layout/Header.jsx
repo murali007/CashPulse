@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Calendar, LogOut, Moon, Sun, Zap } from "lucide-react";
 import { useAppStore } from "../../store/AppStore.jsx";
-import { SIMULATED_DATE_LABEL } from "../../data/mockData.js";
+import { SIMULATED_DATE_LABEL, VERTICALS } from "../../data/mockData.js";
 import { formatINR } from "../../utils/format.js";
 import { ROLES } from "../../data/users.js";
 import Badge from "../common/Badge.jsx";
@@ -9,7 +9,14 @@ import Badge from "../common/Badge.jsx";
 const THEME_KEY = "cashpulse-theme";
 
 export default function Header() {
-  const { bankBalance, currentUser, isAdmin, signOut } = useAppStore();
+  const {
+    bankBalance,
+    currentUser,
+    isAdmin,
+    signOut,
+    currentVertical,
+    switchVertical,
+  } = useAppStore();
   const [isDark, setIsDark] = useState(false);
 
   // On mount: read saved theme, falling back to the OS preference.
@@ -50,6 +57,23 @@ export default function Header() {
             <p className="text-xs text-slate-500 dark:text-slate-400">
               Working-capital copilot
             </p>
+          </div>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="hidden md:inline text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+              🏢 Industry:
+            </span>
+            <select
+              aria-label="Select industry"
+              value={currentVertical}
+              onChange={(e) => switchVertical(e.target.value)}
+              className="min-w-0 max-w-[12rem] md:max-w-xs truncate rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-1 text-xs md:text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {Object.values(VERTICALS).map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

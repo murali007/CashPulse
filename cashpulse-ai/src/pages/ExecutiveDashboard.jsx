@@ -1,10 +1,14 @@
+import { useState } from "react";
 import { Wallet, Receipt, AlertTriangle, MessageCircle, LineChart, PlusCircle } from "lucide-react";
 import { useAppStore } from "../store/AppStore.jsx";
 import Card from "../components/common/Card.jsx";
+import DefendRentModal from "../components/modals/DefendRentModal.jsx";
 import Metric from "../components/common/Metric.jsx";
 import Badge from "../components/common/Badge.jsx";
 import { formatINR, formatDate, daysBetween } from "../utils/format.js";
 import { agingBucket } from "../utils/finance.js";
+
+const TAX_RATE = 0.18;
 
 function reliabilityTone(score) {
   if (score >= 80) return "emerald";
@@ -23,12 +27,20 @@ export default function ExecutiveDashboard() {
     setActiveTab,
   } = useAppStore();
 
+  const [warRoomOpen, setWarRoomOpen] = useState(false);
+
   const overdueInvoices = invoices.filter(
     (inv) => agingBucket(inv, today) !== "paid" && inv.status === "overdue"
   );
   const overdueTotal = overdueInvoices.reduce((sum, inv) => sum + inv.amount, 0);
 
   const runway = getRunway(30);
+
+  const gross = bankBalance;
+  const vault = Math.round(gross * TAX_RATE);
+  const spendable = gross - vault;
+  const spendablePct = Math.round((1 - TAX_RATE) * 100);
+  const taxPct = Math.round(TAX_RATE * 100);
 
   const queue = invoices
     .filter((inv) => inv.status === "pending" || inv.status === "overdue")
@@ -40,13 +52,22 @@ export default function ExecutiveDashboard() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-          Executive Dashboard
-        </h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Your live cash position and the receivables to chase first.
-        </p>
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+            Executive Dashboard
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Your live cash position and the receivables to chase first.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setWarRoomOpen(true)}
+          className="bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg px-4 py-2 shadow-lg animate-pulse"
+        >
+          🚨 Defend My Rent
+        </button>
       </header>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -76,6 +97,77 @@ export default function ExecutiveDashboard() {
           />
         </Card>
       </div>
+
+      <Card className="p-5">
+        <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+          🛡️ Smart Tax & GST Reserve Vault
+        </h2>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          Tax Rate: {taxPct}% standard GST / Advance Tax
+        </p>
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Locked Tax Vault ({taxPct}%)
+            </p>
+            <p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+              {formatINR(vault)}
+            </p>
+            <p className="text-xs font-medium text-amber-600 dark:text-amber-400">Quarantined</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Spendable Operating Cash ({spendablePct}%)
+            </p>
+            <p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+              {formatINR(spendable)}
+            </p>
+            <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+              Safe for Rent & Salaries
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 flex h-3 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+          <div
+            role="img"
+            aria-label={`${spendablePct}% Spendable Operating Capital`}
+            title={`${spendablePct}% Spendable Operating Capital`}
+            className="h-full bg-emerald-500"
+            style={{ width: `${spendablePct}%` }}
+          />
+          <div
+            role="img"
+            aria-label={`${taxPct}% Protected Tax Buffer`}
+            title={`${taxPct}% Protected Tax Buffer`}
+            className="h-full bg-amber-400"
+            style={{ width: `${taxPct}%` }}
+          />
+        </div>
+        <div className="mt-2 flex flex-wrap gap-4 text-xs text-slate-500 dark:text-slate-400">
+          <span className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            {spendablePct}% Spendable Operating Capital
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-amber-400" />
+            {taxPct}% Protected Tax Buffer
+          </span>
+        </div>
+        <div className="mt-4">
+          <span className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+            🛡️ Tax Compliant • Protected from Overhead Expenses
+          </span>
+        </div>
+        <p className="mt-4 text-sm text-slate-600 dark:text-slate-300">
+          {"⚠️ Financial Hygiene Rule: Your gross bank balance is " +
+            formatINR(gross) +
+            ", but only " +
+            formatINR(spendable) +
+            " is safe to spend. " +
+            formatINR(vault) +
+            " is locked in your virtual vault for quarterly GST & tax liability."}
+        </p>
+      </Card>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="p-5 lg:col-span-1">
@@ -194,6 +286,8 @@ export default function ExecutiveDashboard() {
           </button>
         </div>
       </Card>
+
+      <DefendRentModal open={warRoomOpen} onClose={() => setWarRoomOpen(false)} />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import {
   INITIAL_INVOICES,
   INITIAL_RECURRING_BILLS,
   SIMULATED_TODAY,
+  VERTICALS,
 } from "../data/mockData.js";
 import {
   getAgingMatrix,
@@ -130,6 +131,8 @@ const initialState = {
   authError: null,
   isReady: false,
   dbError: null,
+  currentVertical: "studio",
+  studioSnapshot: null,
 };
 
 function nextInvoiceId(invoices) {
@@ -243,6 +246,31 @@ function appStoreReducer(state, action) {
     case "CLEAR_AUTH_ERROR":
       return { ...state, authError: null };
 
+    case "SWITCH_VERTICAL": {
+      const id = action.payload;
+      if (!Object.prototype.hasOwnProperty.call(VERTICALS, id) || id === state.currentVertical) {
+        return state;
+      }
+      // Remember the studio ledger before leaving it.
+      const studioSnapshot =
+        state.currentVertical === "studio"
+          ? {
+              bankBalance: state.bankBalance,
+              invoices: state.invoices,
+              recurringBills: state.recurringBills,
+            }
+          : state.studioSnapshot;
+      const source = id === "studio" && studioSnapshot ? studioSnapshot : VERTICALS[id];
+      return {
+        ...state,
+        studioSnapshot,
+        currentVertical: id,
+        bankBalance: source.bankBalance,
+        invoices: source.invoices,
+        recurringBills: source.recurringBills,
+      };
+    }
+
     default:
       return state;
   }
@@ -309,7 +337,8 @@ export function AppStoreProvider({ children }) {
         status: "pending",
         daysOverdue: 0,
       };
-      await dbAddInvoice(record);
+      // Database holds only the studio ledger; other verticals stay in memory.
+      if (stateRef.current.currentVertical === "studio") await dbAddInvoice(record);
       commit({ type: "ADD_INVOICE", payload: record });
       return record;
     },
@@ -321,9 +350,12 @@ export function AppStoreProvider({ children }) {
       const current = stateRef.current;
       const target = current.invoices.find((inv) => inv.id === id);
       if (!target || target.status === "paid") return;
-      const updates = { status: "paid", daysOverdue: 0 };
-      await dbUpdateInvoice(id, updates);
-      await dbSaveSettings({ bankBalance: current.bankBalance + target.amount });
+      // Database holds only the studio ledger; other verticals stay in memory.
+      if (current.currentVertical === "studio") {
+        const updates = { status: "paid", daysOverdue: 0 };
+        await dbUpdateInvoice(id, updates);
+        await dbSaveSettings({ bankBalance: current.bankBalance + target.amount });
+      }
       commit({ type: "MARK_INVOICE_PAID", payload: id });
     },
     [commit]
@@ -335,7 +367,8 @@ export function AppStoreProvider({ children }) {
         ...bill,
         id: "rb-" + (stateRef.current.recurringBills.length + 1),
       };
-      await dbAddBill(record);
+      // Database holds only the studio ledger; other verticals stay in memory.
+      if (stateRef.current.currentVertical === "studio") await dbAddBill(record);
       commit({ type: "ADD_RECURRING_BILL", payload: record });
       return record;
     },
@@ -363,6 +396,10 @@ export function AppStoreProvider({ children }) {
     () => dispatch({ type: "CLEAR_AUTH_ERROR" }),
     [dispatch]
   );
+  const switchVertical = useCallback(
+    (id) => commit({ type: "SWITCH_VERTICAL", payload: id }),
+    [commit]
+  );
 
   const {
     bankBalance,
@@ -376,6 +413,7 @@ export function AppStoreProvider({ children }) {
     authError,
     isReady,
     dbError,
+    currentVertical,
   } = state;
 
   const isAdmin = currentUser?.role === ROLES.ADMIN;
@@ -434,6 +472,8 @@ export function AppStoreProvider({ children }) {
       addRecurringBill,
       setActiveTab,
       setDelayDays,
+      currentVertical,
+      switchVertical,
       currentUser,
       users,
       authError,
@@ -460,6 +500,8 @@ export function AppStoreProvider({ children }) {
       addRecurringBill,
       setActiveTab,
       setDelayDays,
+      currentVertical,
+      switchVertical,
       currentUser,
       users,
       authError,
