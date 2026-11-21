@@ -1,6 +1,7 @@
 import Header from "./Header.jsx";
 import Sidebar from "./Sidebar.jsx";
 import MobileTabs from "./MobileTabs.jsx";
+import CopilotWidget from "../copilot/CopilotWidget.jsx";
 
 export default function AppLayout({ children }) {
   return (
@@ -15,6 +16,7 @@ export default function AppLayout({ children }) {
           <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
             <div className="mx-auto max-w-7xl">{children}</div>
           </main>
+          <CopilotWidget />
         </div>
       </div>
     </div>

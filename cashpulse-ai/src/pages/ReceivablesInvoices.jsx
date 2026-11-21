@@ -3,8 +3,9 @@ import { useAppStore } from "../store/AppStore.jsx";
 import Card from "../components/common/Card.jsx";
 import Badge from "../components/common/Badge.jsx";
 import WhatsAppModal from "../components/receivables/WhatsAppModal.jsx";
+import InvoiceModal from "../components/receivables/InvoiceModal.jsx";
 import { formatINR, formatDate, daysBetween } from "../utils/format.js";
-import { MessageCircle, CheckCircle2 } from "lucide-react";
+import { MessageCircle, CheckCircle2, FileText } from "lucide-react";
 
 const BUCKET_TONE = {
   current: "sky",
@@ -87,6 +88,7 @@ function RowActions({ invoice, onRemind, onMarkPaid }) {
 export default function ReceivablesInvoices() {
   const { invoices, today, agingMatrix, markInvoicePaid } = useAppStore();
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [pdfInvoice, setPdfInvoice] = useState(null);
 
   const sortedInvoices = useMemo(() => [...invoices].sort(byDueDate), [invoices]);
 
@@ -261,7 +263,15 @@ export default function ReceivablesInvoices() {
                     <ReliabilityMeter score={inv.reliabilityScore} />
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <div className="inline-flex justify-end">
+                    <div className="inline-flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setPdfInvoice(inv)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                      >
+                        <FileText className="h-3.5 w-3.5" />
+                        📄 View PDF
+                      </button>
                       <RowActions
                         invoice={inv}
                         onRemind={openReminder}
@@ -279,6 +289,8 @@ export default function ReceivablesInvoices() {
       {selectedInvoice ? (
         <WhatsAppModal invoice={selectedInvoice} onClose={() => setSelectedInvoice(null)} />
       ) : null}
+
+      <InvoiceModal invoice={pdfInvoice} onClose={() => setPdfInvoice(null)} />
     </div>
   );
 }

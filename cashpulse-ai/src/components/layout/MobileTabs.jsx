@@ -2,12 +2,15 @@ import { useAppStore } from "../../store/AppStore.jsx";
 import { NAV_ITEMS } from "./Sidebar.jsx";
 
 export default function MobileTabs() {
-  const { activeTab, setActiveTab } = useAppStore();
+  const { activeTab, setActiveTab, isAdmin } = useAppStore();
+  const visibleItems = NAV_ITEMS.filter(
+    (item) => isAdmin || item.key !== "runway",
+  );
 
   return (
     <div className="overflow-x-auto border-b border-slate-200 bg-white py-3 dark:border-slate-800 dark:bg-slate-900">
       <nav className="flex gap-2 px-4">
-        {NAV_ITEMS.map((item) => {
+        {visibleItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.key;
           return (

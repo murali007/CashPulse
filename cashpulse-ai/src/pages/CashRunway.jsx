@@ -10,6 +10,7 @@ import {
   TrendingDown,
   ShieldCheck,
   SlidersHorizontal,
+  Lock,
 } from "lucide-react";
 
 const HORIZONS = [30, 60, 90];
@@ -51,7 +52,7 @@ function AlertRow({ tone, icon: Icon, title, children }) {
 }
 
 export default function CashRunway() {
-  const { bankBalance, today, delayDays, setDelayDays, getRunway } = useAppStore();
+  const { bankBalance, today, delayDays, setDelayDays, getRunway, isAdmin } = useAppStore();
   const [horizon, setHorizon] = useState(30);
   const runway = getRunway(horizon);
 
@@ -92,6 +93,30 @@ export default function CashRunway() {
         Lowest projected balance is {formatINR(runway.minBalance)} on{" "}
         {formatDate(runway.minBalanceDate)}.
       </AlertRow>
+    );
+  }
+
+  // Access guard: runs after all hooks. Non-admins see no runway data at all.
+  if (!isAdmin) {
+    return (
+      <Card className="p-6 sm:p-8">
+        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-rose-50 dark:bg-rose-950/40">
+            <Lock className="h-6 w-6 text-rose-600 dark:text-rose-400" aria-hidden="true" />
+          </div>
+          <div className="min-w-0 space-y-2">
+            <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+              Access Restricted
+            </h2>
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+              Cash Runway &amp; Liquidity Stress-Testing are confidential and only visible to Studio Administrators.
+            </p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Your Smart Ingest tab is still available for submitting project invoices.
+            </p>
+          </div>
+        </div>
+      </Card>
     );
   }
 

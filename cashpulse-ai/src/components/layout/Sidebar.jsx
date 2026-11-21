@@ -14,12 +14,15 @@ export const NAV_ITEMS = [
 ];
 
 export default function Sidebar() {
-  const { activeTab, setActiveTab } = useAppStore();
+  const { activeTab, setActiveTab, isAdmin } = useAppStore();
+  const visibleItems = NAV_ITEMS.filter(
+    (item) => isAdmin || item.key !== "runway",
+  );
 
   return (
     <aside className="hidden lg:sticky lg:top-16 lg:block lg:h-[calc(100vh-4rem)] lg:w-64 lg:shrink-0 lg:overflow-y-auto lg:border-r lg:border-slate-200 lg:py-6 lg:dark:border-slate-800">
       <nav className="flex flex-col gap-1 px-3">
-        {NAV_ITEMS.map((item) => {
+        {visibleItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.key;
           return (
