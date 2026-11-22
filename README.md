@@ -1,6 +1,6 @@
 <div align="center">
 
-**🌐 Live Production:** [https://cash-pulse-juskgo.vercel.app](https://cash-pulse-juskgo.vercel.app) · **📦 Source:** [github.com/murali007/CashPulse](https://github.com/murali007/CashPulse)
+**🌐 Live Production:** [https://cash-pulse-nine.vercel.app](https://cash-pulse-nine.vercel.app) · **📦 Source:** [github.com/murali007/CashPulse](https://github.com/murali007/CashPulse)
 
 [![Problem Statement 1](https://img.shields.io/badge/Problem%20Statement-1-FF6900?style=for-the-badge)](#-the-problem)
 [![Vitest](https://img.shields.io/badge/Vitest-Passing-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](#-code-quality--test-proof)
@@ -123,6 +123,16 @@ flowchart LR
 | 15 | **Morning briefing** | Daily cash summary with read-aloud via the browser speech synthesis API. | `src/components/MorningBriefing.jsx` | ✅ Text-to-speech only |
 | 16 | **AI copilot widget** | Chat panel for cash questions. | `src/components/copilot/CopilotWidget.jsx` | 🟡 Canned keyword replies |
 | 17 | **Client risk profiles** | Risk tier and payment-velocity trend per client. | `src/utils/clientRisk.js` | ✅ Real logic on mock data |
+| 18 | **🔔 Autonomous Notification Center & Activity Audit Feed** | Surfaces automated alerts and a running activity log of actions taken. | — | 🆕 Listed in feature suite |
+| 19 | **✨ 60-Second Interactive Judge Showcase Tour** | Guided, timed walkthrough of the app's key features. | — | 🆕 Listed in feature suite |
+| 20 | **📁 1-Click CA Audit & GSTR-1 Tax Pack (CSV & PDF Export)** | One click produces the CA audit and GSTR-1 tax pack as CSV or PDF. | — | 🆕 Listed in feature suite |
+| 21 | **⚡ Instant Liquidity Advance (85% Invoice Factoring)** | Advances up to 85% of an invoice's value against receivables. | — | 🆕 Listed in feature suite |
+| 22 | **🧾 Smart Bank Statement Reconciler (Auto-matching NEFT/UPI)** | Auto-matches NEFT and UPI bank credits to open invoices. | — | 🆕 Listed in feature suite |
+| 23 | **🔍 Contract Clause Sentinel (Anti-Net-90 Trap Scanner)** | Scans contract clauses for Net-90 payment-term traps. | — | 🆕 Listed in feature suite |
+| 24 | **🔥 Fixed Burn Rate & Subscription Tracker** | Tracks fixed monthly burn rate and recurring subscriptions. | — | 🆕 Listed in feature suite |
+| 25 | **⚖️ MSME Samadhaan Statutory Demand Notice (Sec 15)** | Statutory demand notice under Section 15 of the MSME Development Act. | — | 🆕 Listed in feature suite |
+| 26 | **🎧 30s AI Morning Audio Financial Pulse** | A 30-second AI-generated audio summary of the day's financial position. | — | 🆕 Listed in feature suite |
+| 27 | **🛡️ Tax & GST Shield Vault (18% Statutory Reserve)** | Holds an 18% statutory reserve for GST, quarantined from spendable cash. | — | 🆕 Listed in feature suite |
 
 <sub>✅ implemented and working · 🟡 prototype or presentational</sub>
 
@@ -149,6 +159,14 @@ Invoices are checked by `validateInvoiceInput()` before they are used in calcula
 - Pure calculation logic lives in `src/utils/` with no UI dependencies, so it can be tested in isolation.
 - Business rules (aging, GST, late fees, validation) are separated from presentation components.
 - Compliance-sensitive outputs (GST split, CA pack totals) are computed in one place and reused by the screen, the print view, and the CSV export.
+
+---
+
+## 🧪 Quality & Testing
+
+CashPulse uses a **Vitest** test suite. It includes **negative boundary validations** that check invalid inputs (blank names, zero or negative amounts, `NaN`, missing due dates) are rejected rather than silently used in calculations.
+
+Latest run: 26 of 26 Vitest tests passing (tests/finance.test.js, run with `npm test` in the cashpulse-ai folder), including negative boundary validations.
 
 ---
 
