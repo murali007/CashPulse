@@ -5,6 +5,7 @@ import { SIMULATED_DATE_LABEL, VERTICALS } from "../../data/mockData.js";
 import { formatCurrency } from "../../utils/format.js";
 import { ROLES } from "../../data/users.js";
 import Badge from "../common/Badge.jsx";
+import JudgeDemoTour from "../JudgeDemoTour.jsx";
 
 const THEME_KEY = "cashpulse-theme";
 
@@ -20,6 +21,7 @@ export default function Header() {
     setCurrency,
   } = useAppStore();
   const [isDark, setIsDark] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // On mount: read saved theme, falling back to the OS preference.
   useEffect(() => {
@@ -164,8 +166,19 @@ export default function Header() {
               <Moon className="h-4 w-4" aria-hidden="true" />
             )}
           </button>
+
+          <button
+            type="button"
+            aria-label="Open 60-second judge tour"
+            onClick={() => setTourOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-full bg-[#ff6900] hover:bg-[#e05d00] px-3 py-1.5 text-xs font-bold text-white shadow-[0_0_18px_rgba(255,105,0,0.55)] whitespace-nowrap"
+          >
+            ✨ 60-Sec Judge Tour (All Features)
+          </button>
         </div>
       </div>
+
+      <JudgeDemoTour open={tourOpen} onClose={() => setTourOpen(false)} />
     </header>
   );
 }
