@@ -138,6 +138,16 @@ const initialState = {
 
 const VALID_CURRENCIES = ["INR", "USD", "EUR"];
 
+// Remaining 15% reserve of a factored invoice (released on client payment).
+function factoredReserve(inv) {
+  return Math.round(inv.amount) - (inv.factoredPayout ?? Math.round(inv.amount * 0.85));
+}
+
+// Balance increase when an invoice is marked paid: reserve only if factored.
+function paidIncrease(inv) {
+  return inv.factored === true ? factoredReserve(inv) : inv.amount;
+}
+
 function nextInvoiceId(invoices) {
   const max = invoices.reduce((acc, inv) => {
     const match = /(\d+)$/.exec(String(inv.id ?? ""));
@@ -171,11 +181,24 @@ function appStoreReducer(state, action) {
       const wasPaid = target.status === "paid";
       return {
         ...state,
-        bankBalance: wasPaid ? state.bankBalance : state.bankBalance + target.amount,
+        bankBalance: wasPaid ? state.bankBalance : state.bankBalance + paidIncrease(target),
         invoices: state.invoices.map((inv) =>
           inv.id === action.payload
             ? { ...inv, status: "paid", daysOverdue: 0 }
             : inv
+        ),
+      };
+    }
+
+    case "FACTOR_INVOICE": {
+      const { id, payout } = action.payload;
+      const target = state.invoices.find((inv) => inv.id === id);
+      if (!target || target.factored === true || target.status === "paid") return state;
+      return {
+        ...state,
+        bankBalance: state.bankBalance + payout,
+        invoices: state.invoices.map((inv) =>
+          inv.id === id ? { ...inv, factored: true, factoredPayout: payout } : inv
         ),
       };
     }
@@ -361,9 +384,25 @@ export function AppStoreProvider({ children }) {
       if (current.currentVertical === "studio") {
         const updates = { status: "paid", daysOverdue: 0 };
         await dbUpdateInvoice(id, updates);
-        await dbSaveSettings({ bankBalance: current.bankBalance + target.amount });
+        await dbSaveSettings({ bankBalance: current.bankBalance + paidIncrease(target) });
       }
       commit({ type: "MARK_INVOICE_PAID", payload: id });
+    },
+    [commit]
+  );
+
+  const factorInvoice = useCallback(
+    async (id) => {
+      const current = stateRef.current;
+      const target = current.invoices.find((inv) => inv.id === id);
+      if (!target || target.factored === true || target.status === "paid") return;
+      const payout = Math.round(target.amount * 0.85);
+      // Database holds only the studio ledger; other verticals stay in memory.
+      if (current.currentVertical === "studio") {
+        await dbUpdateInvoice(id, { factored: true, factoredPayout: payout });
+        await dbSaveSettings({ bankBalance: current.bankBalance + payout });
+      }
+      commit({ type: "FACTOR_INVOICE", payload: { id, payout } });
     },
     [commit]
   );
@@ -481,6 +520,7 @@ export function AppStoreProvider({ children }) {
       getRunway,
       addInvoice,
       markInvoicePaid,
+      factorInvoice,
       addRecurringBill,
       setActiveTab,
       setDelayDays,
@@ -511,6 +551,7 @@ export function AppStoreProvider({ children }) {
       getRunway,
       addInvoice,
       markInvoicePaid,
+      factorInvoice,
       addRecurringBill,
       setActiveTab,
       setDelayDays,

@@ -81,7 +81,7 @@ export default function RunwayChart({ series = [], height = 280 }) {
   }
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full overflow-x-auto">
       <svg
         viewBox={`0 0 ${WIDTH} ${height}`}
         className="block h-auto w-full"

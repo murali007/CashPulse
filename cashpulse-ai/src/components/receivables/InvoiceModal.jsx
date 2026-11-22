@@ -96,7 +96,7 @@ export default function InvoiceModal({ invoice, onClose }) {
     <div className="invoice-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#2c231d]/60 p-4">
       <style>{PRINT_CSS}</style>
 
-      <div className="w-full" style={{ maxWidth: "210mm" }}>
+      <div className="max-w-3xl w-[95%]" style={{ maxWidth: "210mm" }}>
         {/* Top bar (not printed) */}
         <div className="no-print mb-4 flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">

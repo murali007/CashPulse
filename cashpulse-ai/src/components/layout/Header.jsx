@@ -52,9 +52,9 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 h-16 luxury-panel backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
-      <div className="flex h-full items-center justify-between gap-4 px-4 sm:px-6">
-        <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-40 min-h-[4rem] luxury-panel backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 sm:gap-4 sm:px-6">
+        <div className="flex flex-wrap gap-2 items-center min-w-0">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff6900] text-white shadow-sm">
             <Zap className="h-5 w-5 text-white" aria-hidden="true" />
           </div>
@@ -90,7 +90,7 @@ export default function Header() {
           <span>{SIMULATED_DATE_LABEL}</span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap gap-2 items-center min-w-0">
           {currentUser && (
             <div className="flex items-center gap-2">
               <div className="hidden items-center gap-2 sm:flex">

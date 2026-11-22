@@ -38,8 +38,8 @@ export default function DefendRentModal({ open, onClose }) {
   const complete = pct === 100;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/70 p-4">
-      <div className="relative my-8 w-full max-w-2xl rounded-2xl border-2 border-red-500 bg-white p-6 shadow-2xl dark:bg-slate-900">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/70 p-3 sm:p-4">
+      <div className="relative my-8 max-w-lg w-[95%] max-h-[90vh] overflow-y-auto p-4 mx-auto rounded-2xl border-2 border-red-500 bg-white shadow-2xl dark:bg-slate-900">
         <button
           type="button"
           onClick={onClose}

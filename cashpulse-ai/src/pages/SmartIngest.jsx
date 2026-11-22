@@ -13,10 +13,16 @@ import { useAppStore } from "../store/AppStore.jsx";
 import { addDays, formatDate, formatINR } from "../utils/format.js";
 import { BILL_CATEGORIES } from "../data/mockData.js";
 import { parseWhatsAppChat, WHATSAPP_PRESETS } from "../utils/whatsappParser.js";
+import { validateInvoiceInput } from "../utils/validation.js";
 
 const INPUT_CLASS =
   "mt-1 w-full rounded-xl border border-slate-200 bg-white p-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#ff6900] focus:outline-none focus:ring-1 focus:ring-[#ff6900] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100";
+const INPUT_ERROR_CLASS =
+  "mt-1 w-full rounded-xl border border-red-500 bg-white p-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#ff6900] focus:outline-none focus:ring-1 focus:ring-red-500 dark:border-red-500 dark:bg-slate-950 dark:text-slate-100";
 const LABEL_CLASS = "text-xs font-medium text-slate-700 dark:text-slate-300";
+const EMPTY_TEXT_MESSAGE = "Please enter or paste text to analyze";
+const NO_PROMISE_HINT =
+  "No payment promises found. Include an amount and a date, for example: 'pay 25k by Friday'.";
 const BUTTON_CLASS =
   "inline-flex items-center gap-2 rounded-xl bg-[#ff6900] px-5 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-[#e05d00] disabled:opacity-50 transition";
 const SECTION_TITLE_CLASS =
@@ -104,6 +110,9 @@ export default function SmartIngest() {
   const [voiceIngested, setVoiceIngested] = useState(false);
   const [voiceSaving, setVoiceSaving] = useState(false);
   const [voiceError, setVoiceError] = useState("");
+  const [invoiceErrors, setInvoiceErrors] = useState(null);
+  const [parseHint, setParseHint] = useState("");
+  const [toast, setToast] = useState(null);
 
   // Reveals the transcript one character at a time while playing. The timer is
   // cleared on pause, on preset change and on unmount.
@@ -129,6 +138,12 @@ export default function SmartIngest() {
     return () => clearTimeout(timer);
   }, [billFlash]);
 
+  useEffect(() => {
+    if (!toast) return undefined;
+    const timer = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   const setInvoiceField = (key) => (e) =>
     setInvoiceForm((f) => ({ ...f, [key]: e.target.value }));
   const setBillField = (key) => (e) =>
@@ -136,6 +151,16 @@ export default function SmartIngest() {
 
   const handleInvoiceSubmit = (e) => {
     e.preventDefault();
+    const check = validateInvoiceInput({
+      clientName: invoiceForm.clientName,
+      amount: invoiceForm.amount,
+      dueDate: invoiceForm.dueDate,
+    });
+    if (!check.valid) {
+      setInvoiceErrors(check.errors);
+      return;
+    }
+    setInvoiceErrors(null);
     const amount = Number(invoiceForm.amount);
     if (!invoiceForm.clientName.trim() || !(amount > 0) || !invoiceForm.dueDate) {
       setInvoiceError("Client name, an amount above 0 and a due date are required.");
@@ -180,12 +205,19 @@ export default function SmartIngest() {
 
   const handlePreset = (preset) => {
     setRawText(preset.text);
+    setParseHint("");
     setParsed(null);
     setAddedRows({});
   };
 
   const handleParse = () => {
-    setParsed(parseWhatsAppChat(rawText, today));
+    if (!rawText.trim()) {
+      setToast({ text: EMPTY_TEXT_MESSAGE });
+      return;
+    }
+    const result = parseWhatsAppChat(rawText, today);
+    setParseHint(result.invoices.length === 0 ? NO_PROMISE_HINT : "");
+    setParsed(result);
     setAddedRows({});
   };
 
@@ -242,6 +274,14 @@ export default function SmartIngest() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
+      {toast ? (
+        <div
+          role="status"
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] rounded-full bg-amber-500 text-white px-4 py-2 text-sm font-semibold shadow-lg pointer-events-none"
+        >
+          {toast.text}
+        </div>
+      ) : null}
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
           Smart Ingest
@@ -294,11 +334,17 @@ export default function SmartIngest() {
                   <input
                     type="text"
                     required
+                    aria-invalid={invoiceErrors?.clientName ? true : undefined}
                     value={invoiceForm.clientName}
                     onChange={setInvoiceField("clientName")}
                     placeholder="e.g., Acme Studios"
-                    className={INPUT_CLASS}
+                    className={invoiceErrors?.clientName ? INPUT_ERROR_CLASS : INPUT_CLASS}
                   />
+                  {invoiceErrors?.clientName ? (
+                    <p role="alert" className="mt-1 text-xs font-medium text-red-600">
+                      {invoiceErrors.clientName}
+                    </p>
+                  ) : null}
                 </Field>
                 <Field label="Client email">
                   <input
@@ -332,20 +378,32 @@ export default function SmartIngest() {
                     type="number"
                     required
                     min="1"
+                    aria-invalid={invoiceErrors?.amount ? true : undefined}
                     value={invoiceForm.amount}
                     onChange={setInvoiceField("amount")}
                     placeholder="e.g., 45000"
-                    className={INPUT_CLASS}
+                    className={invoiceErrors?.amount ? INPUT_ERROR_CLASS : INPUT_CLASS}
                   />
+                  {invoiceErrors?.amount ? (
+                    <p role="alert" className="mt-1 text-xs font-medium text-red-600">
+                      {invoiceErrors.amount}
+                    </p>
+                  ) : null}
                 </Field>
                 <Field label="Due date *">
                   <input
                     type="date"
                     required
+                    aria-invalid={invoiceErrors?.dueDate ? true : undefined}
                     value={invoiceForm.dueDate}
                     onChange={setInvoiceField("dueDate")}
-                    className={INPUT_CLASS}
+                    className={invoiceErrors?.dueDate ? INPUT_ERROR_CLASS : INPUT_CLASS}
                   />
+                  {invoiceErrors?.dueDate ? (
+                    <p role="alert" className="mt-1 text-xs font-medium text-red-600">
+                      {invoiceErrors.dueDate}
+                    </p>
+                  ) : null}
                 </Field>
                 <Field label="Reliability score (0–100)">
                   <input
@@ -504,19 +562,22 @@ export default function SmartIngest() {
             <textarea
               rows={6}
               value={rawText}
-              onChange={(e) => setRawText(e.target.value)}
+              onChange={(e) => {
+                setRawText(e.target.value);
+                setParseHint("");
+              }}
               placeholder="[21/11/2026, 10:15] Priya (Sunrise Retail): The ₹35,000 will be cleared by Friday."
               className={`${INPUT_CLASS} mt-0 font-sans leading-relaxed`}
             />
             <button
               type="button"
               onClick={handleParse}
-              disabled={!rawText.trim()}
               className={BUTTON_CLASS}
             >
               <Sparkles className="h-4 w-4" />
               Parse chat
             </button>
+            {parseHint ? <p className="text-xs text-amber-700">{parseHint}</p> : null}
           </div>
 
           {parsed ? (

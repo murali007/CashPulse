@@ -70,6 +70,33 @@ export const INITIAL_INVOICES = [
     daysOverdue: 22,
     reliabilityScore: 34,
   },
+  {
+    id: "INV-002",
+    clientName: "Vertex Labs Pvt Ltd",
+    clientEmail: "accounts@vertexlabs.example",
+    clientPhone: "+919811100002",
+    projectTitle: "Product dashboard milestone",
+    amount: 45000,
+    issueDate: "2026-11-18",
+    dueDate: "2026-11-26",
+    status: "pending",
+    daysOverdue: 0,
+    reliabilityScore: 88,
+  },
+  {
+    id: "INV-003",
+    clientName: "CloudAngles",
+    clientEmail: "accounts@cloudangles.example",
+    clientPhone: "+919811100003",
+    projectTitle: "Brand site milestone",
+    amount: 30000,
+    issueDate: "2026-11-18",
+    dueDate: "2026-11-26",
+    status: "pending",
+    daysOverdue: 0,
+    reliabilityScore: 92,
+  },
+
 ];
 
 export const INITIAL_RECURRING_BILLS = [

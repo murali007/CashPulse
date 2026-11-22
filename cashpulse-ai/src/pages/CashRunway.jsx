@@ -4,6 +4,7 @@ import Card from "../components/common/Card.jsx";
 import Metric from "../components/common/Metric.jsx";
 import Badge from "../components/common/Badge.jsx";
 import RunwayChart from "../components/runway/RunwayChart.jsx";
+import BurnRateTracker from "../components/BurnRateTracker.jsx";
 import { formatINR, formatDate } from "../utils/format.js";
 import {
   AlertTriangle,
@@ -222,7 +223,7 @@ export default function CashRunway() {
       </Card>
 
       {/* Metrics */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card className="luxury-card p-5">
           <Metric
             label="Starting Balance"
@@ -268,9 +269,13 @@ export default function CashRunway() {
           </Badge>
         </div>
         <div className="mt-4">
-          <RunwayChart series={runway.series} height={280} />
+          <div className="w-full overflow-x-auto">
+            <RunwayChart series={runway.series} height={280} />
+          </div>
         </div>
       </Card>
+
+      <BurnRateTracker />
 
       {/* Liquidity crunch alerts */}
       <Card className="luxury-card space-y-3 p-5 sm:p-6">

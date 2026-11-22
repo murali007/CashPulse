@@ -1,10 +1,15 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppStore } from "../store/AppStore.jsx";
 import Card from "../components/common/Card.jsx";
 import Badge from "../components/common/Badge.jsx";
 import WhatsAppModal from "../components/receivables/WhatsAppModal.jsx";
 import InvoiceModal from "../components/receivables/InvoiceModal.jsx";
 import RiskDossier from "../components/receivables/RiskDossier.jsx";
+import MSMENoticeModal from "../components/MSMENoticeModal.jsx";
+import ClientLeaderboard from "../components/ClientLeaderboard.jsx";
+import InvoiceFactoringModal from "../components/InvoiceFactoringModal.jsx";
+import BankReconcilerModal from "../components/BankReconcilerModal.jsx";
+import ContractSentinelModal from "../components/ContractSentinelModal.jsx";
 import { formatINR, formatDate, daysBetween } from "../utils/format.js";
 import { computeLateFee } from "../utils/finance.js";
 import { MessageCircle, CheckCircle2, FileText } from "lucide-react";
@@ -122,25 +127,60 @@ function RowActions({ invoice, onRemind, onMarkPaid }) {
 }
 
 export default function ReceivablesInvoices() {
-  const { invoices, today, agingMatrix, markInvoicePaid } = useAppStore();
+  const { invoices, today, agingMatrix, markInvoicePaid, factorInvoice } = useAppStore();
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [pdfInvoice, setPdfInvoice] = useState(null);
   const [dossierFor, setDossierFor] = useState(null);
+  const [noticeFor, setNoticeFor] = useState(null);
+  const [factorFor, setFactorFor] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [reconcileOpen, setReconcileOpen] = useState(false);
+  const [sentinelOpen, setSentinelOpen] = useState(false);
 
   const sortedInvoices = useMemo(() => [...invoices].sort(byDueDate), [invoices]);
 
+  useEffect(() => {
+    if (!toast) return undefined;
+    const timer = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   const openReminder = (invoice) => setSelectedInvoice(invoice);
+
+  // Look up each invoice's aging bucket from the existing agingMatrix (for mobile badges).
+  const bucketByInvoice = new Map();
+  agingMatrix.forEach((bucket) => {
+    bucket.invoices.forEach((inv) => bucketByInvoice.set(inv.id, bucket));
+  });
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-          Receivables & Invoices
-        </h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Aging buckets, payment status and assisted WhatsApp follow-ups for every invoice.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            Receivables & Invoices
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Aging buckets, payment status and assisted WhatsApp follow-ups for every invoice.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setReconcileOpen(true)}
+            className="rounded-xl border border-[#ffdfca] bg-white px-3 py-2 text-sm font-semibold text-[#ff6900] hover:bg-[#ffdfca] shadow-sm"
+          >
+            🧾 Reconcile Bank
+          </button>
+          <button
+            type="button"
+            onClick={() => setSentinelOpen(true)}
+            className="rounded-xl border border-[#ffdfca] bg-white px-3 py-2 text-sm font-semibold text-[#ff6900] hover:bg-[#ffdfca] shadow-sm"
+          >
+            🔍 Contract Sentinel
+          </button>
+        </div>
       </div>
 
       {/* Aging matrix */}
@@ -215,53 +255,105 @@ export default function ReceivablesInvoices() {
         })}
       </div>
 
+      {/* Client velocity leaderboard */}
+      <ClientLeaderboard />
+
       {/* Mobile: stacked invoice cards */}
       <div className="space-y-3 md:hidden">
         <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">All invoices</h2>
-        {sortedInvoices.map((inv) => (
-          <Card key={inv.id} className="luxury-card p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="truncate font-semibold text-slate-900 dark:text-slate-100">
-                  {inv.clientName}
-                </p>
-                <p className="font-mono text-xs text-slate-400 dark:text-slate-500">{inv.id}</p>
-              </div>
-              <StatusBadge invoice={inv} today={today} />
-            </div>
+        {sortedInvoices.map((inv) => {
+          const paid = inv.status === "paid";
+          const bucket = bucketByInvoice.get(inv.id);
+          const bucketTone = bucket ? (BUCKET_TONE[bucket.key] ?? "slate") : "slate";
 
-            <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              <div className="col-span-2">
-                <dt className="text-xs text-slate-500 dark:text-slate-400">Project</dt>
-                <dd className="text-slate-700 dark:text-slate-300">{inv.projectTitle}</dd>
+          return (
+            <Card key={inv.id} className="luxury-card p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate font-semibold text-slate-900 dark:text-slate-100">
+                    {inv.clientName}
+                  </p>
+                  <p className="font-mono text-xs text-slate-400 dark:text-slate-500">{inv.id}</p>
+                </div>
+                <StatusBadge invoice={inv} today={today} />
               </div>
-              <div>
-                <dt className="text-xs text-slate-500 dark:text-slate-400">Due</dt>
-                <dd className="text-slate-700 dark:text-slate-300">{formatDate(inv.dueDate)}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-slate-500 dark:text-slate-400">Amount</dt>
-                <dd className="font-semibold text-slate-900 dark:text-slate-100">
-                  {formatINR(inv.amount)}
-                </dd>
-              </div>
-              <div className="col-span-2">
-                <dt className="text-xs text-slate-500 dark:text-slate-400">Reliability</dt>
-                <dd>
-                  <ReliabilityMeter score={inv.reliabilityScore} />
-                </dd>
-              </div>
-            </dl>
 
-            <div className="mt-4 border-t border-slate-100 pt-3 dark:border-slate-800">
-              <RowActions
-                invoice={inv}
-                onRemind={openReminder}
-                onMarkPaid={markInvoicePaid}
-              />
-            </div>
-          </Card>
-        ))}
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                {bucket ? <Badge tone={bucketTone}>{bucket.label}</Badge> : null}
+                {inv.factored ? (
+                  <span className="badge-peach px-2 py-0.5 text-[11px] font-semibold">
+                    Factored (85% Paid)
+                  </span>
+                ) : null}
+              </div>
+
+              <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                <div className="col-span-2">
+                  <dt className="text-xs text-slate-500 dark:text-slate-400">Project</dt>
+                  <dd className="text-slate-700 dark:text-slate-300">{inv.projectTitle}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-slate-500 dark:text-slate-400">Due</dt>
+                  <dd className="text-slate-700 dark:text-slate-300">{formatDate(inv.dueDate)}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-slate-500 dark:text-slate-400">Amount</dt>
+                  <dd className="font-semibold text-slate-900 dark:text-slate-100">
+                    {formatINR(inv.amount)}
+                  </dd>
+                </div>
+                <div className="col-span-2">
+                  <dt className="text-xs text-slate-500 dark:text-slate-400">Reliability</dt>
+                  <dd>
+                    <ReliabilityMeter score={inv.reliabilityScore} />
+                  </dd>
+                </div>
+              </dl>
+
+              <div className="mt-4 border-t border-slate-100 pt-3 dark:border-slate-800">
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openReminder(inv)}
+                    disabled={paid}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    WhatsApp
+                  </button>
+                  {!paid && !inv.factored ? (
+                    <button
+                      type="button"
+                      onClick={() => setFactorFor(inv)}
+                      className="rounded-lg bg-[#ff6900] px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[#e05d00]"
+                    >
+                      ⚡ Advance
+                    </button>
+                  ) : null}
+                  {inv.daysOverdue > 30 && !paid ? (
+                    <button
+                      type="button"
+                      onClick={() => setNoticeFor(inv)}
+                      className="rounded-lg border border-[#ffdfca] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#ff6900] hover:bg-[#ffdfca]"
+                    >
+                      ⚖️ MSME Notice
+                    </button>
+                  ) : null}
+                  {!paid ? (
+                    <button
+                      type="button"
+                      onClick={() => markInvoicePaid(inv.id)}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                    >
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                      Paid
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            </Card>
+          );
+        })}
       </div>
 
       {/* Desktop: full invoice table */}
@@ -306,6 +398,11 @@ export default function ReceivablesInvoices() {
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge invoice={inv} today={today} />
+                    {inv.factored ? (
+                      <span className="badge-peach mt-1 inline-block px-2 py-0.5 text-[11px] font-semibold">
+                        Factored (85% Paid)
+                      </span>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3">
                     <div className="relative inline-block">
@@ -343,6 +440,24 @@ export default function ReceivablesInvoices() {
                         onRemind={openReminder}
                         onMarkPaid={markInvoicePaid}
                       />
+                      {inv.status !== "paid" && !inv.factored ? (
+                        <button
+                          type="button"
+                          onClick={() => setFactorFor(inv)}
+                          className="rounded-lg bg-[#ff6900] hover:bg-[#e05d00] px-2.5 py-1 text-xs font-semibold text-white shadow-sm"
+                        >
+                          ⚡ Advance
+                        </button>
+                      ) : null}
+                      {inv.daysOverdue > 30 && inv.status !== "paid" ? (
+                        <button
+                          type="button"
+                          onClick={() => setNoticeFor(inv)}
+                          className="rounded-lg border border-[#ffdfca] bg-white px-2.5 py-1 text-xs font-semibold text-[#ff6900] hover:bg-[#ffdfca]"
+                        >
+                          ⚖️ MSME Notice
+                        </button>
+                      ) : null}
                     </div>
                   </td>
                 </tr>
@@ -357,6 +472,33 @@ export default function ReceivablesInvoices() {
       ) : null}
 
       <InvoiceModal invoice={pdfInvoice} onClose={() => setPdfInvoice(null)} />
+
+      <MSMENoticeModal invoice={noticeFor} onClose={() => setNoticeFor(null)} />
+
+      <InvoiceFactoringModal
+        invoice={factorFor}
+        onClose={() => setFactorFor(null)}
+        onDisburse={(inv) => {
+          factorInvoice(inv.id);
+          setToast("Advance disbursed: " + formatINR(Math.round(inv.amount * 0.85)) + " credited to your balance.");
+          setFactorFor(null);
+        }}
+      />
+
+      {reconcileOpen && (
+        <BankReconcilerModal
+          onClose={() => setReconcileOpen(false)}
+          onDone={(msg) => setToast(msg)}
+        />
+      )}
+
+      {sentinelOpen && <ContractSentinelModal onClose={() => setSentinelOpen(false)} />}
+
+      {toast ? (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] pointer-events-none rounded-full bg-emerald-600 text-white px-4 py-2 text-sm font-semibold shadow-lg">
+          {toast}
+        </div>
+      ) : null}
     </div>
   );
 }

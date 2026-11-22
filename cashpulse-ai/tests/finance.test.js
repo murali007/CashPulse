@@ -6,6 +6,7 @@ import {
   buildRunway,
 } from "../src/utils/finance.js";
 import { formatINR, formatDate, addDays, daysBetween } from "../src/utils/format.js";
+import { validateInvoiceInput } from "../src/utils/validation.js";
 
 describe("CashPulse Financial Engine - Unit Test Suite", () => {
   const TODAY = "2026-11-21";
@@ -186,5 +187,75 @@ describe("CashPulse Financial Engine - Unit Test Suite", () => {
     it("should add days to ISO date safely", () => {
       expect(addDays("2026-11-21", 10)).toBe("2026-12-01");
     });
+  });
+});
+
+describe("invoice validation", () => {
+  const AMOUNT_MSG = "Amount must be a positive number (minimum ₹1)";
+
+  it("accepts a complete, valid invoice", () => {
+    const result = validateInvoiceInput({
+      clientName: "Northwind Labs",
+      amount: 40000,
+      dueDate: "2026-12-05",
+    });
+    expect(result.valid).toBe(true);
+    expect(result.errors.clientName).toBeNull();
+    expect(result.errors.amount).toBeNull();
+    expect(result.errors.dueDate).toBeNull();
+  });
+
+  it("rejects an empty client name", () => {
+    const result = validateInvoiceInput({ clientName: "", amount: 1000, dueDate: "2026-12-05" });
+    expect(result.valid).toBe(false);
+    expect(result.errors.clientName).toBe("Client name is required");
+  });
+
+  it("rejects a whitespace-only client name", () => {
+    const result = validateInvoiceInput({ clientName: "   ", amount: 1000, dueDate: "2026-12-05" });
+    expect(result.errors.clientName).toBe("Client name is required");
+  });
+
+  it("rejects an amount of zero", () => {
+    const result = validateInvoiceInput({ clientName: "Acme", amount: 0, dueDate: "2026-12-05" });
+    expect(result.errors.amount).toBe(AMOUNT_MSG);
+  });
+
+  it("rejects a negative amount", () => {
+    const result = validateInvoiceInput({ clientName: "Acme", amount: -5, dueDate: "2026-12-05" });
+    expect(result.errors.amount).toBe(AMOUNT_MSG);
+  });
+
+  it("rejects a missing amount", () => {
+    const result = validateInvoiceInput({ clientName: "Acme", dueDate: "2026-12-05" });
+    expect(result.errors.amount).toBe(AMOUNT_MSG);
+  });
+
+  it("rejects a NaN amount", () => {
+    const result = validateInvoiceInput({ clientName: "Acme", amount: NaN, dueDate: "2026-12-05" });
+    expect(result.errors.amount).toBe(AMOUNT_MSG);
+  });
+
+  it("rejects an amount below the ₹1 minimum", () => {
+    const result = validateInvoiceInput({ clientName: "Acme", amount: 0.5, dueDate: "2026-12-05" });
+    expect(result.errors.amount).toBe(AMOUNT_MSG);
+  });
+
+  it("rejects a missing due date", () => {
+    const result = validateInvoiceInput({ clientName: "Acme", amount: 1000 });
+    expect(result.errors.dueDate).toBe("Due date is required");
+  });
+
+  it("rejects an empty due date", () => {
+    const result = validateInvoiceInput({ clientName: "Acme", amount: 1000, dueDate: "" });
+    expect(result.errors.dueDate).toBe("Due date is required");
+  });
+
+  it("reports every invalid field at once", () => {
+    const result = validateInvoiceInput({ clientName: "", amount: 0, dueDate: "" });
+    expect(result.valid).toBe(false);
+    expect(result.errors.clientName).not.toBeNull();
+    expect(result.errors.amount).not.toBeNull();
+    expect(result.errors.dueDate).not.toBeNull();
   });
 });
