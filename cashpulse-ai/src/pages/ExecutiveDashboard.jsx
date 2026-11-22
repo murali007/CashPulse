@@ -52,6 +52,23 @@ export default function ExecutiveDashboard() {
 
   return (
     <div className="space-y-6">
+      <section className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-900/40 rounded-2xl p-6 shadow-xl">
+        <div className="flex items-center gap-3">
+          <span className="relative flex h-3 w-3">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500" />
+          </span>
+          <h2 className="text-white font-semibold text-lg">
+            Good evening, Ravi • 30-Day Working Capital Defense Active
+          </h2>
+        </div>
+        <p className="mt-2 text-indigo-200 text-sm">
+          {"Live cash runway: " +
+            formatINR(bankBalance) +
+            " liquid • Next major bill: Office Rent (₹35k on Dec 01)"}
+        </p>
+      </section>
+
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">

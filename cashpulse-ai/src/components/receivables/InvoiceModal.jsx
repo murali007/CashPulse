@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { X, Printer, MessageCircle } from "lucide-react";
+import { X, Printer, MessageCircle, Shield, ShieldCheck, Lock } from "lucide-react";
 import { formatINR, formatDate } from "../../utils/format.js";
 
 const PAYMENT_LINE =
@@ -239,20 +239,36 @@ export default function InvoiceModal({ invoice, onClose }) {
 
           {/* Escrow Deliverables Vault (stays visible when printed) */}
           {locked ? (
-            <div className="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-              <p className="text-[11px] font-semibold uppercase tracking-wider">
-                Escrow Deliverables Vault
-              </p>
-              <p className="mt-1">
-                🔒 Production Deliverables Locked in Escrow. Pay via UPI to auto-release.
-              </p>
+            <div className="mt-6 rounded-xl border-2 border-amber-400 bg-amber-50 p-4 text-sm text-amber-900 flex items-center gap-4">
+              <div
+                className="relative inline-flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-600 ring-4 ring-amber-300/60 shadow-[0_0_24px_rgba(245,158,11,0.55)] animate-pulse"
+                aria-hidden="true"
+              >
+                <Shield className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider">
+                  Escrow Deliverables Vault
+                </p>
+                <p className="mt-1">
+                  🔒 Production Deliverables Locked in Escrow. Pay via UPI to auto-release.
+                </p>
+              </div>
             </div>
           ) : (
-            <div className="mt-6 rounded-lg border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900">
-              <p className="text-[11px] font-semibold uppercase tracking-wider">
-                Escrow Deliverables Vault
-              </p>
-              <p className="mt-1">🔓 Production Assets Unlocked &amp; Verified.</p>
+            <div className="mt-6 rounded-xl border-2 border-emerald-400 bg-emerald-50 p-4 text-sm text-emerald-900 flex items-center gap-4">
+              <div
+                className="relative inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 ring-4 ring-emerald-300/60 shadow-[0_0_24px_rgba(16,185,129,0.55)]"
+                aria-hidden="true"
+              >
+                <ShieldCheck className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider">
+                  Escrow Deliverables Vault
+                </p>
+                <p className="mt-1">🔓 Production Assets Unlocked &amp; Verified for Download</p>
+              </div>
             </div>
           )}
 

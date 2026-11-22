@@ -354,6 +354,28 @@ export default function SmartIngest() {
             </div>
           </div>
 
+          <div className="max-w-md mx-auto overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 shadow-lg">
+            <div className="bg-emerald-700 text-white px-4 py-2.5 rounded-t-xl flex items-center justify-between">
+              <span className="text-sm font-semibold">WhatsApp • Client Agreement Chat</span>
+              <span className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-300" />
+                <span className="text-xs">online</span>
+              </span>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-900 p-4 border border-slate-200 dark:border-slate-800 min-h-[12rem]">
+              {rawText.trim() ? (
+                <div className="max-w-[85%] rounded-lg rounded-tl-none bg-white dark:bg-slate-800 px-3 py-2 shadow-sm">
+                  <p className="whitespace-pre-wrap text-sm text-slate-800 dark:text-slate-100">{rawText}</p>
+                  <p className="mt-1 text-right text-[10px] text-slate-400">✓✓ 11:42 AM</p>
+                </div>
+              ) : (
+                <div className="max-w-[85%] rounded-lg rounded-tl-none bg-white dark:bg-slate-800 px-3 py-2 shadow-sm">
+                  <p className="text-sm italic text-slate-400 dark:text-slate-500">Paste a WhatsApp chat above to parse promises.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="space-y-3">
             <textarea
               rows={6}

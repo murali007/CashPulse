@@ -24,6 +24,40 @@ const BUCKET_TEXT = {
 
 const STATUS_TONE = { paid: "emerald", pending: "sky", overdue: "rose" };
 
+const CLIENT_AVATARS = {
+  "Northwind Labs": { initials: "NL", gradient: "bg-gradient-to-br from-indigo-500 to-blue-600" },
+  "Bluepeak Media": { initials: "BM", gradient: "bg-gradient-to-br from-cyan-400 to-sky-600" },
+  "Orbit Fintech": { initials: "OF", gradient: "bg-gradient-to-br from-emerald-400 to-teal-600" },
+  "Sunrise Retail Co.": { initials: "SR", gradient: "bg-gradient-to-br from-amber-400 to-orange-500" },
+  "Helix Health Tech": { initials: "HH", gradient: "bg-gradient-to-br from-rose-400 to-pink-600" },
+};
+
+// Map a client name to its avatar initials and gradient classes.
+function clientAvatar(clientName) {
+  const known = CLIENT_AVATARS[clientName];
+  if (known) return known;
+  const initials = String(clientName)
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word.charAt(0))
+    .join("")
+    .toUpperCase();
+  return { initials, gradient: "bg-gradient-to-br from-slate-400 to-slate-600" };
+}
+
+function ClientAvatar({ name }) {
+  const { initials, gradient } = clientAvatar(name);
+  return (
+    <span
+      className={"inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-md " + gradient}
+      aria-hidden="true"
+    >
+      {initials}
+    </span>
+  );
+}
+
 // Derive display status: paid, overdue (past due or flagged), or pending.
 function getStatus(invoice, today) {
   if (invoice.status === "paid") return "paid";
@@ -144,12 +178,15 @@ export default function ReceivablesInvoices() {
                         onClick={() => openReminder(inv)}
                         className="flex w-full items-center justify-between gap-3 rounded-xl border border-slate-100 px-3 py-2 text-left transition hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50"
                       >
-                        <span className="min-w-0">
-                          <span className="block truncate text-sm font-medium text-slate-800 dark:text-slate-200">
-                            {inv.clientName}
-                          </span>
-                          <span className="block font-mono text-xs text-slate-400 dark:text-slate-500">
-                            {inv.id}
+                        <span className="flex min-w-0 items-center gap-2">
+                          <ClientAvatar name={inv.clientName} />
+                          <span className="min-w-0">
+                            <span className="block truncate text-sm font-medium text-slate-800 dark:text-slate-200">
+                              {inv.clientName}
+                            </span>
+                            <span className="block font-mono text-xs text-slate-400 dark:text-slate-500">
+                              {inv.id}
+                            </span>
                           </span>
                         </span>
                         <span className="shrink-0 text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -249,7 +286,10 @@ export default function ReceivablesInvoices() {
                     {inv.id}
                   </td>
                   <td className="px-4 py-3 font-semibold text-slate-900 dark:text-slate-100">
-                    {inv.clientName}
+                    <span className="flex items-center gap-2">
+                      <ClientAvatar name={inv.clientName} />
+                      {inv.clientName}
+                    </span>
                   </td>
                   <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{inv.projectTitle}</td>
                   <td className="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
