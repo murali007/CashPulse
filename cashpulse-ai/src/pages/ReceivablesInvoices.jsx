@@ -10,6 +10,7 @@ import ClientLeaderboard from "../components/ClientLeaderboard.jsx";
 import InvoiceFactoringModal from "../components/InvoiceFactoringModal.jsx";
 import BankReconcilerModal from "../components/BankReconcilerModal.jsx";
 import ContractSentinelModal from "../components/ContractSentinelModal.jsx";
+import CAAuditPackModal from '../components/CAAuditPackModal';
 import { formatINR, formatDate, daysBetween } from "../utils/format.js";
 import { computeLateFee } from "../utils/finance.js";
 import { MessageCircle, CheckCircle2, FileText } from "lucide-react";
@@ -136,6 +137,7 @@ export default function ReceivablesInvoices() {
   const [toast, setToast] = useState(null);
   const [reconcileOpen, setReconcileOpen] = useState(false);
   const [sentinelOpen, setSentinelOpen] = useState(false);
+  const [showCAPack, setShowCAPack] = useState(false);
 
   const sortedInvoices = useMemo(() => [...invoices].sort(byDueDate), [invoices]);
 
@@ -179,6 +181,13 @@ export default function ReceivablesInvoices() {
             className="rounded-xl border border-[#ffdfca] bg-white px-3 py-2 text-sm font-semibold text-[#ff6900] hover:bg-[#ffdfca] shadow-sm"
           >
             🔍 Contract Sentinel
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowCAPack(true)}
+            className="rounded-xl border border-[#ffdfca] bg-white px-3 py-2 text-sm font-semibold text-[#ff6900] hover:bg-[#ffdfca] shadow-sm"
+          >
+            📁 CA Audit Pack
           </button>
         </div>
       </div>
@@ -493,6 +502,8 @@ export default function ReceivablesInvoices() {
       )}
 
       {sentinelOpen && <ContractSentinelModal onClose={() => setSentinelOpen(false)} />}
+
+      {showCAPack && <CAAuditPackModal invoices={invoices} onClose={() => setShowCAPack(false)} />}
 
       {toast ? (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] pointer-events-none rounded-full bg-emerald-600 text-white px-4 py-2 text-sm font-semibold shadow-lg">
