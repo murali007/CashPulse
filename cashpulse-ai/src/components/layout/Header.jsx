@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Calendar, LogOut, Moon, Sun, Zap } from "lucide-react";
 import { useAppStore } from "../../store/AppStore.jsx";
 import { SIMULATED_DATE_LABEL, VERTICALS } from "../../data/mockData.js";
-import { formatINR } from "../../utils/format.js";
+import { formatCurrency } from "../../utils/format.js";
 import { ROLES } from "../../data/users.js";
 import Badge from "../common/Badge.jsx";
 
@@ -16,6 +16,8 @@ export default function Header() {
     signOut,
     currentVertical,
     switchVertical,
+    currency,
+    setCurrency,
   } = useAppStore();
   const [isDark, setIsDark] = useState(false);
 
@@ -43,11 +45,17 @@ export default function Header() {
   const balancePositive = bankBalance >= 0;
   const isAdminRole = currentUser?.role === ROLES.ADMIN;
 
+  const currencyOptions = [
+    { code: "INR", label: "₹ INR" },
+    { code: "USD", label: "$ USD" },
+    { code: "EUR", label: "€ EUR" },
+  ];
+
   return (
-    <header className="sticky top-0 z-40 h-16 border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
+    <header className="sticky top-0 z-40 h-16 luxury-panel backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
       <div className="flex h-full items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-sky-500 shadow-sm">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff6900] text-white shadow-sm">
             <Zap className="h-5 w-5 text-white" aria-hidden="true" />
           </div>
           <div className="leading-tight">
@@ -66,7 +74,7 @@ export default function Header() {
               aria-label="Select industry"
               value={currentVertical}
               onChange={(e) => switchVertical(e.target.value)}
-              className="min-w-0 max-w-[12rem] md:max-w-xs truncate rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-1 text-xs md:text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="min-w-0 max-w-[12rem] md:max-w-xs truncate rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-1 text-xs md:text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#ff6900]"
             >
               {Object.values(VERTICALS).map((v) => (
                 <option key={v.id} value={v.id}>
@@ -117,10 +125,32 @@ export default function Header() {
                     : "text-rose-600 dark:text-rose-400"
                 }`}
               >
-                {formatINR(bankBalance)}
+                {formatCurrency(bankBalance, currency)}
               </span>
             </div>
           )}
+
+          <div
+            role="group"
+            aria-label="Currency"
+            className="inline-flex rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-0.5 text-xs font-semibold"
+          >
+            {currencyOptions.map(({ code, label }) => (
+              <button
+                key={code}
+                type="button"
+                aria-pressed={currency === code}
+                onClick={() => setCurrency(code)}
+                className={`rounded-full px-2.5 py-1 transition ${
+                  currency === code
+                    ? "bg-[#ff6900] text-white shadow-sm"
+                    : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
 
           <button
             type="button"

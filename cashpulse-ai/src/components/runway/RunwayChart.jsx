@@ -90,8 +90,8 @@ export default function RunwayChart({ series = [], height = 280 }) {
       >
         <defs>
           <linearGradient id="runway-area-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#6366f1" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#6366f1" stopOpacity="0.02" />
+            <stop offset="0%" stopColor="#ff6900" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#ff6900" stopOpacity="0.05" />
           </linearGradient>
         </defs>
 
@@ -147,7 +147,7 @@ export default function RunwayChart({ series = [], height = 280 }) {
         <path
           d={linePath}
           fill="none"
-          stroke="#6366f1"
+          stroke="#ff6900"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -185,7 +185,7 @@ export default function RunwayChart({ series = [], height = 280 }) {
               x2={hx}
               y1={topY}
               y2={bottomY}
-              className="stroke-indigo-400"
+              className="stroke-[#ff6900]"
               strokeWidth="1"
               strokeDasharray="3 3"
             />
@@ -193,7 +193,7 @@ export default function RunwayChart({ series = [], height = 280 }) {
               cx={hx}
               cy={hy}
               r="4.5"
-              className="fill-indigo-600 stroke-white dark:stroke-slate-900"
+              className="fill-[#ff6900] stroke-white dark:stroke-slate-900"
               strokeWidth="2"
             />
             <rect
@@ -214,7 +214,7 @@ export default function RunwayChart({ series = [], height = 280 }) {
             <text
               x={tipX + 10}
               y={topY + 36}
-              className="fill-indigo-600 text-[11px] font-bold dark:fill-indigo-400"
+              className="fill-[#ff6900] text-[11px] font-bold dark:fill-[#ffb27a]"
             >
               {formatINR(hp.balance)}
             </text>

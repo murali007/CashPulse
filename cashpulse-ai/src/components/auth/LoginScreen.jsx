@@ -9,16 +9,16 @@ const TABS = [
 ];
 
 const inputClass =
-  "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500";
+  "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-[#ff6900] focus:outline-none focus:ring-2 focus:ring-[#ff6900]/30 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500";
 
 const labelClass =
   "mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400";
 
 const submitClass =
-  "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 dark:bg-indigo-500 dark:hover:bg-indigo-400";
+  "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff6900] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#e05d00] focus:outline-none focus:ring-2 focus:ring-[#ff6900]/50 dark:bg-[#ff6900] dark:hover:bg-[#ff8a33]";
 
 const demoButtonClass =
-  "inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800";
+  "inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-[#ff6900]/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800";
 
 export default function LoginScreen() {
   const { signIn, signUp, authError, clearAuthError } = useAppStore();
@@ -53,7 +53,7 @@ export default function LoginScreen() {
       <Card className="w-full max-w-md p-6 sm:p-8">
         {/* Brand header */}
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md">
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ff6900] text-white shadow-md">
             <Zap className="h-6 w-6 text-white" aria-hidden="true" />
           </div>
           <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
@@ -79,7 +79,7 @@ export default function LoginScreen() {
                 aria-selected={selected}
                 onClick={() => switchMode(tab.id)}
                 className={[
-                  "rounded-lg px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/40",
+                  "rounded-lg px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#ff6900]/40",
                   selected
                     ? "bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-slate-100"
                     : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200",

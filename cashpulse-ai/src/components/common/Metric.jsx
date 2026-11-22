@@ -3,7 +3,7 @@ const ICON_TONE_CLASSES = {
   amber: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300",
   rose: "bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300",
   sky: "bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-300",
-  indigo: "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300",
+  indigo: "bg-[#ffdfca] text-[#ff6900] dark:bg-[#ff6900]/15 dark:text-[#ffb27a]",
   slate: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
 };
 

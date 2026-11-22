@@ -153,3 +153,16 @@ export function buildRunwayScenarios({
     90: make(90),
   };
 }
+
+/**
+ * Statutory 1.5% monthly late interest, applied only when more than 7 days overdue.
+ * @param {number} amount - Invoice principal.
+ * @param {number} daysOverdue - Days past due date.
+ * @returns {{ lateFee: number, totalWithInterest: number }}
+ */
+export function computeLateFee(amount, daysOverdue) {
+  if (!(daysOverdue > 7)) return { lateFee: 0, totalWithInterest: amount };
+  const lateFee = Math.round(amount * 0.015 * (daysOverdue / 30));
+  return { lateFee, totalWithInterest: amount + lateFee };
+}
+

@@ -68,7 +68,7 @@ export default function CopilotWidget() {
   return (
     <>
       {open && (
-        <div className="fixed bottom-24 right-6 z-50 flex h-[28rem] w-[min(22rem,calc(100vw-3rem))] flex-col rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900">
+        <div className="fixed bottom-24 right-6 z-50 flex h-[28rem] w-[min(22rem,calc(100vw-3rem))] flex-col luxury-card shadow-xl dark:border-slate-800 dark:bg-slate-900">
           <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-800">
             <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">Copilot Tour Guide</span>
             <button
@@ -93,7 +93,7 @@ export default function CopilotWidget() {
               ) : (
                 <div
                   key={m.id}
-                  className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-indigo-600 px-3 py-2 text-sm text-white"
+                  className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-[#ff6900] px-3 py-2 text-sm text-white"
                 >
                   {m.text}
                 </div>
@@ -121,12 +121,12 @@ export default function CopilotWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type your question..."
-              className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+              className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#ff6900] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
             />
             <button
               type="submit"
               aria-label="Send"
-              className="rounded-lg bg-indigo-600 p-2 text-white hover:bg-indigo-700"
+              className="rounded-lg bg-[#ff6900] p-2 text-white hover:bg-[#e05d00]"
             >
               <Send className="h-4 w-4" />
             </button>
@@ -138,7 +138,7 @@ export default function CopilotWidget() {
         type="button"
         aria-label="Ask Copilot / Tour Guide"
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 text-2xl text-white shadow-lg hover:from-indigo-600 hover:to-indigo-800"
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#ff6900] to-[#e05d00] text-2xl text-white shadow-lg hover:from-[#e05d00] hover:to-[#c24f00]"
       >
         💡
       </button>

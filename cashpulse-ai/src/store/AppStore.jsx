@@ -133,7 +133,10 @@ const initialState = {
   dbError: null,
   currentVertical: "studio",
   studioSnapshot: null,
+  currency: "INR",
 };
+
+const VALID_CURRENCIES = ["INR", "USD", "EUR"];
 
 function nextInvoiceId(invoices) {
   const max = invoices.reduce((acc, inv) => {
@@ -192,6 +195,10 @@ function appStoreReducer(state, action) {
       const safe = Number.isFinite(num) ? Math.round(num) : 0;
       return { ...state, delayDays: Math.min(60, Math.max(0, safe)) };
     }
+
+    case "SET_CURRENCY":
+      if (!VALID_CURRENCIES.includes(action.payload)) return state;
+      return { ...state, currency: action.payload };
 
     case "SIGN_IN": {
       const email = normalizeEmail(action.payload?.email);
@@ -382,6 +389,10 @@ export function AppStoreProvider({ children }) {
     (days) => dispatch({ type: "SET_DELAY_DAYS", payload: days }),
     [dispatch]
   );
+  const setCurrency = useCallback(
+    (curr) => dispatch({ type: "SET_CURRENCY", payload: curr }),
+    [dispatch]
+  );
   const signIn = useCallback(
     (email, password) =>
       dispatch({ type: "SIGN_IN", payload: { email, password } }),
@@ -414,6 +425,7 @@ export function AppStoreProvider({ children }) {
     isReady,
     dbError,
     currentVertical,
+    currency,
   } = state;
 
   const isAdmin = currentUser?.role === ROLES.ADMIN;
@@ -472,6 +484,8 @@ export function AppStoreProvider({ children }) {
       addRecurringBill,
       setActiveTab,
       setDelayDays,
+      currency,
+      setCurrency,
       currentVertical,
       switchVertical,
       currentUser,
@@ -500,6 +514,8 @@ export function AppStoreProvider({ children }) {
       addRecurringBill,
       setActiveTab,
       setDelayDays,
+      currency,
+      setCurrency,
       currentVertical,
       switchVertical,
       currentUser,

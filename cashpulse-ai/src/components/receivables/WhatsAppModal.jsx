@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { MessageCircle, X, Copy, Check, ExternalLink } from "lucide-react";
 import { useAppStore } from "../../store/AppStore.jsx";
 import { formatINR, formatDate, daysBetween, addDays } from "../../utils/format.js";
+import { computeLateFee } from "../../utils/finance.js";
 
 const TONES = [
   { id: "friendly", label: "Friendly" },
@@ -40,6 +41,7 @@ export default function WhatsAppModal({ invoice, onClose }) {
     invoice ? buildMessage(invoice, "friendly", today) : ""
   );
   const [copied, setCopied] = useState(false);
+  const [waiverOn, setWaiverOn] = useState(false);
 
   // Close on Escape.
   useEffect(() => {
@@ -61,6 +63,8 @@ export default function WhatsAppModal({ invoice, onClose }) {
   if (!invoice) return null;
 
   const daysOverdue = Math.max(0, daysBetween(invoice.dueDate, today));
+  const { lateFee, totalWithInterest } = computeLateFee(invoice.amount, daysOverdue);
+  const waiverMessage = `⚠️ Statement Notice: As per MSME contract terms, late interest of ${formatINR(lateFee)} has accrued on Invoice #${invoice.id} (Total: ${formatINR(totalWithInterest)}).\n\n💡 Instant Settlement Offer: If cleared before 5:00 PM today, we will waive the entire ${formatINR(lateFee)} fee and accept the original base amount of ${formatINR(invoice.amount)}. UPI: ravi@upi.`;
   const digits = (invoice.clientPhone || "").replace(/\D/g, "");
   const waHref = `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
 
@@ -84,13 +88,13 @@ export default function WhatsAppModal({ invoice, onClose }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="whatsapp-modal-title"
-        className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900"
+        className="luxury-card w-full max-w-lg p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900"
       >
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4 dark:border-slate-800">
+        <div className="luxury-panel flex items-start justify-between gap-4 border-b border-slate-100 pb-4 dark:border-slate-800">
           <h2
             id="whatsapp-modal-title"
-            className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-slate-100"
+            className="flex items-center gap-2 text-lg font-bold text-[#282828] dark:text-slate-100"
           >
             <MessageCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
             Assisted WhatsApp follow-up
@@ -99,7 +103,7 @@ export default function WhatsAppModal({ invoice, onClose }) {
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            className="rounded-lg p-1 text-slate-400 hover:bg-[#ffdfca] hover:text-[#ff6900] dark:hover:bg-slate-800 dark:hover:text-slate-200"
           >
             <X className="h-5 w-5" />
           </button>
@@ -155,10 +159,10 @@ export default function WhatsAppModal({ invoice, onClose }) {
                   type="button"
                   aria-pressed={active}
                   onClick={() => selectTone(t.id)}
-                  className={`rounded-lg px-2 py-2 text-xs font-semibold transition ${
+                  className={`rounded-lg border px-2 py-2 text-xs font-semibold transition ${
                     active
-                      ? "bg-white text-indigo-600 shadow-sm dark:bg-slate-900 dark:text-indigo-400"
-                      : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                      ? "border-[#ff6900] bg-white text-[#ff6900] shadow-sm dark:bg-slate-900 dark:text-[#ffb27a]"
+                      : "border-transparent text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                   }`}
                 >
                   {t.label}
@@ -167,6 +171,35 @@ export default function WhatsAppModal({ invoice, onClose }) {
             })}
           </div>
         </div>
+
+        {/* MSME late fee & waiver */}
+        {lateFee > 0 && (
+          <div className="mt-5">
+            <button
+              type="button"
+              aria-expanded={waiverOn}
+              onClick={() => setWaiverOn((v) => !v)}
+              className="flex w-full items-center justify-between rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-left text-xs font-semibold text-amber-800 hover:bg-amber-100 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-950/60"
+            >
+              ⚖️ MSME Late Fee &amp; Penalty Waiver
+              <span aria-hidden="true">{waiverOn ? "▲" : "▼"}</span>
+            </button>
+            {waiverOn && (
+              <div className="mt-2 space-y-3 rounded-xl border border-amber-200 bg-amber-50/60 p-3 text-xs text-slate-700 dark:border-amber-900/60 dark:bg-amber-950/20 dark:text-slate-300">
+                <p className="font-medium">
+                  {`Base: ${formatINR(invoice.amount)} + Accrued Late Fee: ${formatINR(lateFee)} = Total: ${formatINR(totalWithInterest)}`}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setMessage(waiverMessage)}
+                  className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-amber-400 dark:bg-amber-600 dark:hover:bg-amber-500"
+                >
+                  Use waiver offer message
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Editable message */}
         <div className="mt-5">
@@ -181,7 +214,7 @@ export default function WhatsAppModal({ invoice, onClose }) {
             rows={6}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="mt-2 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200"
+            className="mt-2 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-800 focus:border-[#ff6900] focus:outline-none focus:ring-2 focus:ring-[#ff6900]/20 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200"
           />
         </div>
 

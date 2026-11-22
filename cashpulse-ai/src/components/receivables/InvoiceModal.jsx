@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { X, Printer, MessageCircle, Shield, ShieldCheck, Lock } from "lucide-react";
 import { formatINR, formatDate } from "../../utils/format.js";
+import { useAppStore } from "../../store/AppStore.jsx";
 
 const PAYMENT_LINE =
   "UPI ID: ravi@upi | Bank Transfer: HDFC Bank A/C 501002345678";
@@ -68,6 +69,9 @@ export default function InvoiceModal({ invoice, onClose }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [invoice, onClose]);
 
+  const { currency } = useAppStore();
+  const isINR = currency === "INR";
+
   if (!invoice) return null;
 
   const upiParams = `pa=ravi@upi&pn=CashPulse%20Studio&am=${invoice.amount}&cu=INR&tn=Invoice%20${invoice.id}`;
@@ -89,7 +93,7 @@ export default function InvoiceModal({ invoice, onClose }) {
   };
 
   return (
-    <div className="invoice-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/60 p-4">
+    <div className="invoice-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#2c231d]/60 p-4">
       <style>{PRINT_CSS}</style>
 
       <div className="w-full" style={{ maxWidth: "210mm" }}>
@@ -99,7 +103,7 @@ export default function InvoiceModal({ invoice, onClose }) {
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#ff6900] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#e05d00] dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
             >
               <Printer className="h-3.5 w-3.5" />
               📥 Save / Print PDF
@@ -117,7 +121,7 @@ export default function InvoiceModal({ invoice, onClose }) {
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-700 shadow-sm transition hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-700 shadow-sm transition hover:bg-[#ffdfca] hover:text-[#ff6900] dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
           >
             <X className="h-4 w-4" />
           </button>
@@ -193,9 +197,15 @@ export default function InvoiceModal({ invoice, onClose }) {
               Payment instructions
             </p>
             <p className="mt-1 text-slate-900">{PAYMENT_LINE}</p>
+            {!isINR && (
+              <div className="mt-3 rounded-lg border bg-slate-50 border-slate-300 px-3 py-2 text-slate-800">
+                🌍 International Wire: SWIFT: HDFCINBB • Stripe Payment Link: stripe.com/pay/cashpulse
+              </div>
+            )}
           </div>
 
-          {/* Instant UPI payment (QR stays printed; app-pay button is hidden on print) */}
+          {/* Instant UPI payment (INR only; QR stays printed; app-pay button is hidden on print) */}
+          {isINR && (
           <div className="mt-6 rounded-lg border border-slate-200 p-4 text-sm">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
               ⚡ Instant UPI Payment
@@ -229,13 +239,14 @@ export default function InvoiceModal({ invoice, onClose }) {
                 <p className="text-slate-900">UPI ID: ravi@upi</p>
                 <a
                   href={upiLink}
-                  className="no-print inline-flex w-fit items-center rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-700"
+                  className="no-print inline-flex w-fit items-center rounded-lg bg-[#ff6900] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#e05d00]"
                 >
                   📲 Pay via UPI App (GPay / PhonePe)
                 </a>
               </div>
             </div>
           </div>
+          )}
 
           {/* Escrow Deliverables Vault (stays visible when printed) */}
           {locked ? (

@@ -12,6 +12,19 @@ export function formatINR(amount) {
   return inrFormatter.format(amount);
 }
 
+export const CURRENCY_RATES = {
+  INR: { rate: 1, symbol: "₹" },
+  USD: { rate: 0.012, symbol: "$" },
+  EUR: { rate: 0.011, symbol: "€" },
+};
+
+// Converts a stored INR amount to the chosen currency for display.
+export function formatCurrency(amountINR, currency = "INR") {
+  if (currency === "INR") return formatINR(amountINR);
+  const { rate, symbol } = CURRENCY_RATES[currency] ?? CURRENCY_RATES.INR;
+  return symbol + Math.round(amountINR * rate).toLocaleString(currency === "USD" ? "en-US" : "en-IE");
+}
+
 export function formatDate(isoDate) {
   return new Date(isoDate + "T00:00:00Z").toLocaleDateString("en-IN", {
     day: "2-digit",

@@ -6,6 +6,7 @@ import WhatsAppModal from "../components/receivables/WhatsAppModal.jsx";
 import InvoiceModal from "../components/receivables/InvoiceModal.jsx";
 import RiskDossier from "../components/receivables/RiskDossier.jsx";
 import { formatINR, formatDate, daysBetween } from "../utils/format.js";
+import { computeLateFee } from "../utils/finance.js";
 import { MessageCircle, CheckCircle2, FileText } from "lucide-react";
 
 const BUCKET_TONE = {
@@ -25,7 +26,7 @@ const BUCKET_TEXT = {
 const STATUS_TONE = { paid: "emerald", pending: "sky", overdue: "rose" };
 
 const CLIENT_AVATARS = {
-  "Northwind Labs": { initials: "NL", gradient: "bg-gradient-to-br from-indigo-500 to-blue-600" },
+  "Northwind Labs": { initials: "NL", gradient: "bg-gradient-to-br from-[#ff6900] to-[#e05d00]" },
   "Bluepeak Media": { initials: "BM", gradient: "bg-gradient-to-br from-cyan-400 to-sky-600" },
   "Orbit Fintech": { initials: "OF", gradient: "bg-gradient-to-br from-emerald-400 to-teal-600" },
   "Sunrise Retail Co.": { initials: "SR", gradient: "bg-gradient-to-br from-amber-400 to-orange-500" },
@@ -150,7 +151,7 @@ export default function ReceivablesInvoices() {
           const list = [...bucket.invoices].sort(byDueDate);
 
           return (
-            <Card key={bucket.key} className="flex flex-col p-5">
+            <Card key={bucket.key} className="luxury-card flex flex-col p-5">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -218,7 +219,7 @@ export default function ReceivablesInvoices() {
       <div className="space-y-3 md:hidden">
         <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">All invoices</h2>
         {sortedInvoices.map((inv) => (
-          <Card key={inv.id} className="p-4">
+          <Card key={inv.id} className="luxury-card p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="truncate font-semibold text-slate-900 dark:text-slate-100">
@@ -264,10 +265,10 @@ export default function ReceivablesInvoices() {
       </div>
 
       {/* Desktop: full invoice table */}
-      <Card className="hidden overflow-hidden md:block">
+      <Card className="luxury-card hidden overflow-hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+            <thead className="luxury-panel border-b border-slate-200 text-xs font-semibold text-[#282828] dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
               <tr>
                 <th className="px-4 py-3">Invoice</th>
                 <th className="px-4 py-3">Client</th>
@@ -297,6 +298,11 @@ export default function ReceivablesInvoices() {
                   </td>
                   <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100">
                     {formatINR(inv.amount)}
+                    {inv.daysOverdue > 7 && inv.status !== "paid" ? (
+                      <span className="mt-1 inline-block rounded-md bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+                        +{formatINR(computeLateFee(inv.amount, inv.daysOverdue).lateFee)} MSME Late Interest
+                      </span>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge invoice={inv} today={today} />

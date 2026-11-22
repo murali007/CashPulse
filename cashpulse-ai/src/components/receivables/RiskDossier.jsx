@@ -26,7 +26,7 @@ export default function RiskDossier({ clientName, reliabilityScore, onClose }) {
     <div
       role="dialog"
       aria-label="Client Risk Dossier"
-      className="w-72 rounded-xl border border-slate-200 bg-white p-4 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+      className="luxury-card w-72 p-4 shadow-xl dark:border-slate-700 dark:bg-slate-900"
     >
       <div className="flex items-start justify-between gap-2">
         <div>
@@ -39,7 +39,7 @@ export default function RiskDossier({ clientName, reliabilityScore, onClose }) {
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+          className="rounded-md p-1 text-slate-500 hover:bg-[#ffdfca] hover:text-[#ff6900] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
         >
           <X size={16} />
         </button>

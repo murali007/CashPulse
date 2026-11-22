@@ -52,7 +52,7 @@ export default function ExecutiveDashboard() {
 
   return (
     <div className="space-y-6">
-      <section className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-900/40 rounded-2xl p-6 shadow-xl">
+      <section className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-orange-950 to-slate-900 border border-orange-900/40 rounded-2xl p-6 shadow-xl">
         <div className="flex items-center gap-3">
           <span className="relative flex h-3 w-3">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
@@ -62,7 +62,7 @@ export default function ExecutiveDashboard() {
             Good evening, Ravi • 30-Day Working Capital Defense Active
           </h2>
         </div>
-        <p className="mt-2 text-indigo-200 text-sm">
+        <p className="mt-2 text-orange-200 text-sm">
           {"Live cash runway: " +
             formatINR(bankBalance) +
             " liquid • Next major bill: Office Rent (₹35k on Dec 01)"}
@@ -88,7 +88,7 @@ export default function ExecutiveDashboard() {
       </header>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="p-5">
+        <Card className="luxury-card p-5">
           <Metric
             label="Live Balance"
             value={formatINR(bankBalance)}
@@ -96,7 +96,7 @@ export default function ExecutiveDashboard() {
             tone="emerald"
           />
         </Card>
-        <Card className="p-5">
+        <Card className="luxury-card p-5">
           <Metric
             label="Outstanding"
             value={formatINR(outstanding)}
@@ -104,7 +104,7 @@ export default function ExecutiveDashboard() {
             tone="sky"
           />
         </Card>
-        <Card className="p-5">
+        <Card className="luxury-card p-5">
           <Metric
             label="Overdue"
             value={formatINR(overdueTotal)}
@@ -115,7 +115,7 @@ export default function ExecutiveDashboard() {
         </Card>
       </div>
 
-      <Card className="p-5">
+      <Card className="luxury-card p-5">
         <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
           🛡️ Smart Tax & GST Reserve Vault
         </h2>
@@ -187,7 +187,7 @@ export default function ExecutiveDashboard() {
       </Card>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="p-5 lg:col-span-1">
+        <Card className="luxury-card p-5 lg:col-span-1">
           <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
             30-day runway
           </h2>
@@ -216,7 +216,7 @@ export default function ExecutiveDashboard() {
           </div>
         </Card>
 
-        <Card className="p-5 lg:col-span-2">
+        <Card className="luxury-card p-5 lg:col-span-2">
           <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
             Priority cash recovery
           </h2>
@@ -272,7 +272,7 @@ export default function ExecutiveDashboard() {
         </Card>
       </div>
 
-      <Card className="p-5">
+      <Card className="luxury-card p-5">
         <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
           Quick actions
         </h2>

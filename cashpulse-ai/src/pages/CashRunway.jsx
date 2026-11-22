@@ -99,7 +99,7 @@ export default function CashRunway() {
   // Access guard: runs after all hooks. Non-admins see no runway data at all.
   if (!isAdmin) {
     return (
-      <Card className="p-6 sm:p-8">
+      <Card className="luxury-card p-6 sm:p-8">
         <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-rose-50 dark:bg-rose-950/40">
             <Lock className="h-6 w-6 text-rose-600 dark:text-rose-400" aria-hidden="true" />
@@ -147,7 +147,7 @@ export default function CashRunway() {
                 onClick={() => setHorizon(h)}
                 className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition ${
                   active
-                    ? "bg-white text-indigo-600 shadow-sm dark:bg-slate-900 dark:text-indigo-400"
+                    ? "bg-[#ff6900] hover:bg-[#e05d00] text-white shadow-sm dark:bg-[#ff6900] dark:text-white"
                     : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                 }`}
               >
@@ -159,10 +159,10 @@ export default function CashRunway() {
       </div>
 
       {/* What-if slider */}
-      <Card className="space-y-4 p-5 sm:p-6">
+      <Card className="luxury-card space-y-4 p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="h-5 w-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+            <SlidersHorizontal className="h-5 w-5 text-[#ff6900] dark:text-orange-400" aria-hidden="true" />
             <label
               htmlFor="delay-slider"
               className="text-sm font-semibold text-slate-900 dark:text-slate-100"
@@ -170,7 +170,7 @@ export default function CashRunway() {
               What if clients pay {delayDays} days late?
             </label>
           </div>
-          <span className="rounded-md bg-indigo-50 px-2.5 py-0.5 font-mono text-xs font-bold text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
+          <span className="badge-peach rounded-md px-2.5 py-0.5 font-mono text-xs font-bold dark:bg-orange-500/10 dark:text-orange-300">
             +{delayDays} days
           </span>
         </div>
@@ -183,7 +183,7 @@ export default function CashRunway() {
           step="1"
           value={delayDays}
           onChange={(e) => setDelayDays(Number(e.target.value))}
-          className="h-2 w-full cursor-pointer rounded-lg bg-slate-200 accent-indigo-600 dark:bg-slate-700"
+          className="h-2 w-full cursor-pointer rounded-lg bg-slate-200 accent-[#ff6900] dark:bg-slate-700"
         />
 
         <div className="flex justify-between font-mono text-[11px] text-slate-400 dark:text-slate-500">
@@ -206,8 +206,8 @@ export default function CashRunway() {
                 onClick={() => setDelayDays(d)}
                 className={`rounded-lg border px-3 py-1 text-xs font-semibold transition ${
                   active
-                    ? "border-indigo-600 bg-indigo-600 text-white dark:border-indigo-500 dark:bg-indigo-500"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:text-indigo-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-indigo-700 dark:hover:text-indigo-300"
+                    ? "border-[#ff6900] bg-[#ff6900] hover:bg-[#e05d00] text-white shadow-sm dark:border-[#ff6900] dark:bg-[#ff6900]"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-orange-300 hover:text-[#ff6900] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-orange-700 dark:hover:text-orange-300"
                 }`}
               >
                 {d}
@@ -223,7 +223,7 @@ export default function CashRunway() {
 
       {/* Metrics */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="p-5">
+        <Card className="luxury-card p-5">
           <Metric
             label="Starting Balance"
             value={formatINR(bankBalance)}
@@ -232,7 +232,7 @@ export default function CashRunway() {
             tone="sky"
           />
         </Card>
-        <Card className="p-5">
+        <Card className="luxury-card p-5">
           <Metric
             label={`Projected Ending (${horizon}d)`}
             value={formatINR(runway.endingBalance)}
@@ -241,7 +241,7 @@ export default function CashRunway() {
             tone={runway.endingBalance < 0 ? "rose" : "emerald"}
           />
         </Card>
-        <Card className="p-5">
+        <Card className="luxury-card p-5">
           <Metric
             label="Lowest Point"
             value={formatINR(runway.minBalance)}
@@ -253,7 +253,7 @@ export default function CashRunway() {
       </div>
 
       {/* Chart */}
-      <Card className="p-5 sm:p-6">
+      <Card className="luxury-card p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4 dark:border-slate-800">
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
@@ -273,7 +273,7 @@ export default function CashRunway() {
       </Card>
 
       {/* Liquidity crunch alerts */}
-      <Card className="space-y-3 p-5 sm:p-6">
+      <Card className="luxury-card space-y-3 p-5 sm:p-6">
         <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
           Liquidity Alerts
         </h2>
