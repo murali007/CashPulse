@@ -41,3 +41,16 @@ export function validateInvoiceInput({ clientName, amount, dueDate } = {}) {
   const valid = errors.clientName === null && errors.amount === null && errors.dueDate === null;
   return { valid, errors };
 }
+
+/**
+ * Sanitizes free-text input by removing HTML-like tags and trimming whitespace.
+ * Non-string values yield an empty string.
+ *
+ * @param {unknown} str
+ * @returns {string}
+ */
+export function sanitizeInput(str) {
+  if (typeof str !== "string") return "";
+  return str.replace(/<[^>]*>/g, "").trim();
+}
+

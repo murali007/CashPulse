@@ -61,3 +61,5 @@
   background-color: rgba(255, 105, 0, 0.18);
   color: #ffb27a;
 }
+
+.privacy-blur { filter: blur(6px); user-select: none; transition: filter 0.2s ease; }

@@ -13,7 +13,7 @@ import { useAppStore } from "../store/AppStore.jsx";
 import { addDays, formatDate, formatINR } from "../utils/format.js";
 import { BILL_CATEGORIES } from "../data/mockData.js";
 import { parseWhatsAppChat, WHATSAPP_PRESETS } from "../utils/whatsappParser.js";
-import { validateInvoiceInput } from "../utils/validation.js";
+import { sanitizeInput, validateInvoiceInput } from "../utils/validation.js";
 
 const INPUT_CLASS =
   "mt-1 w-full rounded-xl border border-slate-200 bg-white p-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#ff6900] focus:outline-none focus:ring-1 focus:ring-[#ff6900] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100";
@@ -151,8 +151,10 @@ export default function SmartIngest() {
 
   const handleInvoiceSubmit = (e) => {
     e.preventDefault();
+    const clientName = sanitizeInput(invoiceForm.clientName);
+    const projectTitle = sanitizeInput(invoiceForm.projectTitle);
     const check = validateInvoiceInput({
-      clientName: invoiceForm.clientName,
+      clientName,
       amount: invoiceForm.amount,
       dueDate: invoiceForm.dueDate,
     });
@@ -162,16 +164,16 @@ export default function SmartIngest() {
     }
     setInvoiceErrors(null);
     const amount = Number(invoiceForm.amount);
-    if (!invoiceForm.clientName.trim() || !(amount > 0) || !invoiceForm.dueDate) {
+    if (!clientName || !(amount > 0) || !invoiceForm.dueDate) {
       setInvoiceError("Client name, an amount above 0 and a due date are required.");
       return;
     }
     const score = Number(invoiceForm.reliabilityScore);
     addInvoice({
-      clientName: invoiceForm.clientName.trim(),
+      clientName,
       clientEmail: invoiceForm.clientEmail.trim(),
       clientPhone: invoiceForm.clientPhone.trim(),
-      projectTitle: invoiceForm.projectTitle.trim(),
+      projectTitle,
       dueDate: invoiceForm.dueDate,
       issueDate: today,
       status: "pending",

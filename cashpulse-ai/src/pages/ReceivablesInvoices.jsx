@@ -128,7 +128,7 @@ function RowActions({ invoice, onRemind, onMarkPaid }) {
 }
 
 export default function ReceivablesInvoices() {
-  const { invoices, today, agingMatrix, markInvoicePaid, factorInvoice } = useAppStore();
+  const { invoices, today, agingMatrix, markInvoicePaid, factorInvoice, privacyMode } = useAppStore();
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [pdfInvoice, setPdfInvoice] = useState(null);
   const [dossierFor, setDossierFor] = useState(null);
@@ -207,7 +207,7 @@ export default function ReceivablesInvoices() {
                     {bucket.label}
                   </p>
                   <p className={`mt-1 text-2xl font-bold ${BUCKET_TEXT[tone]}`}>
-                    {formatINR(bucket.total)}
+                    <span className={privacyMode ? "privacy-blur" : undefined}>{formatINR(bucket.total)}</span>
                   </p>
                 </div>
                 <Badge tone={tone}>
@@ -398,7 +398,7 @@ export default function ReceivablesInvoices() {
                     {formatDate(inv.dueDate)}
                   </td>
                   <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100">
-                    {formatINR(inv.amount)}
+                    <span className={privacyMode ? "privacy-blur" : undefined}>{formatINR(inv.amount)}</span>
                     {inv.daysOverdue > 7 && inv.status !== "paid" ? (
                       <span className="mt-1 inline-block rounded-md bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
                         +{formatINR(computeLateFee(inv.amount, inv.daysOverdue).lateFee)} MSME Late Interest

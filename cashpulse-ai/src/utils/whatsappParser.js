@@ -1,5 +1,6 @@
 // Heuristic WhatsApp chat parser. Plain JavaScript, no React, no external calls.
 import { addDays, daysBetween } from "./format.js";
+import { sanitizeInput } from "./validation.js";
 
 const TIMESTAMP_RE = /^\s*\[?\d{1,2}\/\d{1,2}\/\d{2,4},?\s+\d{1,2}:\d{2}(?::\d{2})?\]?\s*(?:[-–]\s*)?/;
 const SENDER_RE = /^([^:\d]{1,60}):\s*(.*)$/;
@@ -101,7 +102,7 @@ export function parseWhatsAppChat(rawText, today) {
       }
 
       invoices.push({
-        clientName: clientName || "Unknown client",
+        clientName: sanitizeInput(clientName) || "Unknown client",
         clientEmail: "",
         clientPhone: "",
         projectTitle: "Parsed from WhatsApp",

@@ -25,6 +25,7 @@ export default function ExecutiveDashboard() {
     getRunway,
     markInvoicePaid,
     setActiveTab,
+    privacyMode,
   } = useAppStore();
 
   const [warRoomOpen, setWarRoomOpen] = useState(false);
@@ -91,7 +92,7 @@ export default function ExecutiveDashboard() {
         <Card className="luxury-card p-5">
           <Metric
             label="Live Balance"
-            value={formatINR(bankBalance)}
+            value={<span className={privacyMode ? "privacy-blur" : undefined}>{formatINR(bankBalance)}</span>}
             icon={Wallet}
             tone="emerald"
           />
@@ -99,7 +100,7 @@ export default function ExecutiveDashboard() {
         <Card className="luxury-card p-5">
           <Metric
             label="Outstanding"
-            value={formatINR(outstanding)}
+            value={<span className={privacyMode ? "privacy-blur" : undefined}>{formatINR(outstanding)}</span>}
             icon={Receipt}
             tone="sky"
           />
@@ -107,7 +108,7 @@ export default function ExecutiveDashboard() {
         <Card className="luxury-card p-5">
           <Metric
             label="Overdue"
-            value={formatINR(overdueTotal)}
+            value={<span className={privacyMode ? "privacy-blur" : undefined}>{formatINR(overdueTotal)}</span>}
             hint={`${overdueInvoices.length} overdue invoice${overdueInvoices.length === 1 ? "" : "s"}`}
             icon={AlertTriangle}
             tone="rose"

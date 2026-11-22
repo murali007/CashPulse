@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { Calendar, LogOut, Moon, Sun, Zap } from "lucide-react";
+import { Calendar, Eye, EyeOff, LogOut, Moon, Sun, Zap } from "lucide-react";
 import { useAppStore } from "../../store/AppStore.jsx";
 import { SIMULATED_DATE_LABEL, VERTICALS } from "../../data/mockData.js";
 import { formatCurrency } from "../../utils/format.js";
 import { ROLES } from "../../data/users.js";
 import Badge from "../common/Badge.jsx";
 import JudgeDemoTour from "../JudgeDemoTour.jsx";
+import NotificationCenter from "../NotificationCenter";
+
 
 const THEME_KEY = "cashpulse-theme";
 
@@ -19,6 +21,8 @@ export default function Header() {
     switchVertical,
     currency,
     setCurrency,
+    privacyMode,
+    togglePrivacyMode,
   } = useAppStore();
   const [isDark, setIsDark] = useState(false);
   const [tourOpen, setTourOpen] = useState(false);
@@ -127,7 +131,9 @@ export default function Header() {
                     : "text-rose-600 dark:text-rose-400"
                 }`}
               >
-                {formatCurrency(bankBalance, currency)}
+                <span className={privacyMode ? "privacy-blur" : undefined}>
+                  {formatCurrency(bankBalance, currency)}
+                </span>
               </span>
             </div>
           )}
@@ -166,6 +172,23 @@ export default function Header() {
               <Moon className="h-4 w-4" aria-hidden="true" />
             )}
           </button>
+
+          <button
+            type="button"
+            onClick={togglePrivacyMode}
+            aria-label={privacyMode ? "Show amounts" : "Hide amounts"}
+            title={privacyMode ? "Show amounts" : "Hide amounts"}
+            aria-pressed={privacyMode}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            {privacyMode ? (
+              <EyeOff className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <Eye className="h-4 w-4" aria-hidden="true" />
+            )}
+          </button>
+
+          <NotificationCenter />
 
           <button
             type="button"

@@ -134,6 +134,7 @@ const initialState = {
   currentVertical: "studio",
   studioSnapshot: null,
   currency: "INR",
+  privacyMode: false,
 };
 
 const VALID_CURRENCIES = ["INR", "USD", "EUR"];
@@ -222,6 +223,9 @@ function appStoreReducer(state, action) {
     case "SET_CURRENCY":
       if (!VALID_CURRENCIES.includes(action.payload)) return state;
       return { ...state, currency: action.payload };
+
+    case "TOGGLE_PRIVACY_MODE":
+      return { ...state, privacyMode: !state.privacyMode };
 
     case "SIGN_IN": {
       const email = normalizeEmail(action.payload?.email);
@@ -432,6 +436,10 @@ export function AppStoreProvider({ children }) {
     (curr) => dispatch({ type: "SET_CURRENCY", payload: curr }),
     [dispatch]
   );
+  const togglePrivacyMode = useCallback(
+    () => dispatch({ type: "TOGGLE_PRIVACY_MODE" }),
+    [dispatch]
+  );
   const signIn = useCallback(
     (email, password) =>
       dispatch({ type: "SIGN_IN", payload: { email, password } }),
@@ -465,6 +473,7 @@ export function AppStoreProvider({ children }) {
     dbError,
     currentVertical,
     currency,
+    privacyMode,
   } = state;
 
   const isAdmin = currentUser?.role === ROLES.ADMIN;
@@ -526,6 +535,8 @@ export function AppStoreProvider({ children }) {
       setDelayDays,
       currency,
       setCurrency,
+      privacyMode,
+      togglePrivacyMode,
       currentVertical,
       switchVertical,
       currentUser,
@@ -557,6 +568,8 @@ export function AppStoreProvider({ children }) {
       setDelayDays,
       currency,
       setCurrency,
+      privacyMode,
+      togglePrivacyMode,
       currentVertical,
       switchVertical,
       currentUser,
